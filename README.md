@@ -9,10 +9,11 @@ in the lid. One parametric FreeCAD script, printed on a Creality K1.
 
 - **Matched footprints.** The keyboard (133 × 68 mm) and the phone (131.5 × 64.2 mm) are almost the same size,
   so the deck closes to 138 × 91 × 26 mm.
-- **Slide-in phone.** The phone slides in from the left on lipped rails. A flexing tongue in the lid plate
-  clicks in behind it, and the camera bump runs in its own channel.
-- **Locks at 112°.** The lid's hinge knuckles land flat on the rear foot, and a magnet pair per hinge snaps them
-  there: no wobble, and taps on the screen push into the stop. Pull the lid forward to close it. The foot also
+- **Slide-in phone, one-piece frame.** The phone slides in from the left between the back plate and a lip that
+  runs all the way round the screen. A flexing tongue in the plate clicks in behind it, and the camera bump runs in
+  its own channel. The side button has a flared window; grooves keep the buttons from being pressed as it slides.
+- **Locks at 112°.** A web across the back of the lid lands flat on the rear foot, and three pairs of magnets snap
+  it there: no wobble, and taps on the screen push into the stop. Pull the lid forward to close it. The foot also
   keeps the deck from tipping backwards.
 - **Charge in place.** A channel through the rear foot fits a USB-C plug for the keyboard's back-edge port.
 - **Self-checking.** The script asserts that the lid swings clear from 0° to the stop, that the stop engages, and
@@ -31,13 +32,13 @@ in the lid. One parametric FreeCAD script, printed on a Creality K1.
 ## Hardware
 
 - 2 × M3×20 socket head screws: the hinge pins. They self-tap into the inner base knuckle, no nuts.
-- 4 × 6×2 mm disc magnets (N52) for the open lock.
+- 6 × 8×1 mm disc magnets for the open lock (3 pairs; 2 pairs also work).
 - Optional MagSafe steel ring sticker behind the phone. Without it, set `RING = 0`.
 
 ## Assembly
 
-Glue the magnets in first: one in each lid knuckle's flat face and one in the foot pocket below it. Stack each pair
-so they attract and mark the faces that touch, then glue them in with CA glue, marked faces out.
+Glue the magnets in first: three in the lid's back web and three in the foot. Stack each pair so they attract and
+mark the faces that touch, then glue them in with CA glue, marked faces out.
 
 The hinge is not print-in-place. Close the lid on the base: each lid knuckle drops into the gap between two base
 knuckles. The lid's bore is 3.1 mm so the screw shank sits snugly in it; if it binds, run a 3 mm drill through. From each side, drive an M3×20 through the counterbored outer knuckle and the lid knuckle into the
