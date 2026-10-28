@@ -144,14 +144,19 @@ def make_lid():
                              rrect(ww, wd, wr, wx, wy, z0 + c)], True, True))
     s = s.cut(rbox(ww, wd, LIP_T + 1, wr, wx, wy, z0 + c - 0.1))
     # Landscape, camera end on the user's left: lid y=0 is the top edge once opened.
-    # Camera bump runs in a channel open to the left edge so it can slide in.
-    s = s.cut(rbox(PX + 33 + 10, 30, PLATE + 2, 6, -10, PY + 2, zp - 1))
-    # Latch: cantilever tongue in the plate, ramped bump at its free (left) end holds the phone's left edge.
+    # Camera bump slides in along a groove in the plate, then sits in a window so the camera still sees.
+    # Neither reaches the lid's left end, so the plate's end stays whole.
+    s = s.cut(rbox(PX + 33 + 10, 30, PLATE - 0.6 + 1, 6, -10, PY + 2, zp - 1))
+    s = s.cut(rbox(PX + 33 - PHONE_X - 1, 30, PLATE + 2, 6, PHONE_X + 1, PY + 2, zp - 1))
+    # Latch: cantilever tongue in the plate, free end just inside a strip at the lid's end; a ramped bump there
+    # holds the phone's left edge. Release: push the bump up through the open end.
+    x0 = 1.2
     for y in (YC - TONGUE_W / 2 - SLIT, YC + TONGUE_W / 2):
-        s = s.cut(Part.makeBox(TONGUE_L + 1, SLIT, PLATE + 2, V(-1, y, zp - 1)))
-    bx = PX + 2 * PH_CLR - 0.3
-    bump = Part.makePolygon([V(1, 0, zp + 0.5), V(1, 0, zp), V(1 + BUMP_H, 0, zp - BUMP_H),
-                             V(bx, 0, zp - BUMP_H), V(bx, 0, zp + 0.5), V(1, 0, zp + 0.5)])
+        s = s.cut(Part.makeBox(TONGUE_L, SLIT, PLATE + 2, V(x0, y, zp - 1)))
+    s = s.cut(Part.makeBox(SLIT, TONGUE_W + 2 * SLIT, PLATE + 2, V(x0, YC - TONGUE_W / 2 - SLIT, zp - 1)))
+    x0, bx = x0 + SLIT, PX + 2 * PH_CLR - 0.3
+    bump = Part.makePolygon([V(x0, 0, zp + 0.5), V(x0, 0, zp), V(bx, 0, zp - BUMP_H), V(bx, 0, zp + 0.5),
+                             V(x0, 0, zp + 0.5)])
     s = s.fuse(Part.Face(bump).extrude(V(0, TONGUE_W, 0)).translate(V(0, YC - TONGUE_W / 2, 0)))
     # Buttons: relief grooves so sliding in doesn't press them; the side button gets a flared window.
     for y in (PY - 0.8, PY + PPD - 0.5):
