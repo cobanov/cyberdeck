@@ -12,7 +12,8 @@ KB_W, KB_D = 133.0, 68.0
 KB_BODY = 9.5            # plastic housing
 KB_KEYS = 12.0           # housing + membrane keys
 PH_W, PH_D, PH_T = 131.5, 64.2, 7.4   # iPhone 12 mini, Apple spec
-CORNER_R = 7.0           # keyboard and iPhone 12 mini share this corner radius; measure it with stl/radius_gauge.stl
+CORNER_R = 11.5          # keyboard and iPhone 12 mini share this corner radius; estimate, measure with stl/radius_gauge.stl
+                         # too large binds the corners once it exceeds the real radius by ~1 mm; too small only leaves gaps
 
 # --- fit ---
 KB_CLR, PH_CLR = 0.4, 0.5
@@ -37,7 +38,8 @@ KB_CUTOUTS = [("back", 28 - 7.5, 15)]   # USB-C on the back edge, centred ~28 mm
 
 PW, PD = KB_W + 2 * KB_CLR, KB_D + 2 * KB_CLR
 W, D = PW + 2 * WALL, PD + 2 * WALL
-R_OUT = CORNER_R + KB_CLR + WALL                    # outer corners concentric with the keyboard
+R_OUT = CORNER_R + KB_CLR + WALL                    # front corners concentric with the keyboard
+R_BACK = 6.0                                        # back corners stay tight so the hinge foot keeps its material
 PH_R = CORNER_R + PH_CLR
 HB = FLOOR + KB_KEYS + KEY_GAP
 HL = PLATE + RING + PH_T + LIP_T
@@ -48,10 +50,15 @@ PPW, PPD = PH_W + 2 * PH_CLR, PH_D + 2 * PH_CLR
 PX, PY = W - WALL_R - PPW, (D - PPD) / 2               # phone pocket origin in the lid
 
 
-def rbox(w, d, h, r, x=0, y=0, z=0):
+def rbox(w, d, h, r, x=0, y=0, z=0, r_back=None):
+    """Box with rounded vertical edges; the two back (max y) edges get r_back if given."""
     b = Part.makeBox(w, d, h, V(x, y, z))
-    vert = [e for e in b.Edges if e.BoundBox.XLength < 1e-6 and e.BoundBox.YLength < 1e-6]
-    return b.makeFillet(r, vert) if r > 0 else b
+    vert = lambda s: [e for e in s.Edges if e.BoundBox.XLength < 1e-6 and e.BoundBox.YLength < 1e-6]
+    if r_back is None:
+        return b.makeFillet(r, vert(b)) if r > 0 else b
+    is_back = lambda e: abs(e.BoundBox.YMin - (y + d)) < 1e-6
+    b = b.makeFillet(r, [e for e in vert(b) if not is_back(e)])
+    return b.makeFillet(r_back, [e for e in vert(b) if is_back(e)])
 
 
 def xcyl(r, x0, x1):
@@ -71,7 +78,7 @@ def hinge_spans(left):
 
 
 def make_base():
-    s = rbox(W, Y_END, HB, R_OUT)
+    s = rbox(W, Y_END, HB, R_OUT, r_back=R_BACK)
     s = s.cut(rbox(PW, PD, HB, CORNER_R + KB_CLR, WALL, WALL, FLOOR))  # keyboard pocket
     s = s.cut(rbox(W - 30, D - 30, FLOOR + 2, 4, 15, 15, -1))          # push-out window
     s = s.cut(Part.makeCylinder(10, WALL + 2, V(W / 2, -1, HB + 6), V(0, 1, 0)))   # finger notch to lift the lid
@@ -97,7 +104,7 @@ def make_base():
 
 def make_lid():
     z0 = HB
-    s = rbox(W, D, HL, R_OUT, 0, 0, z0)
+    s = rbox(W, D, HL, R_OUT, 0, 0, z0, r_back=R_BACK)
     zp = z0 + HL - PLATE                                                 # plate inner face
     # Rail channel open at the left end (rbox starts off-part so the left corners vanish), lips leave a screen window.
     s = s.cut(rbox(PX + PPW + 10, PPD, zp - z0 - LIP_T, PH_R, -10, PY, z0 + LIP_T))
@@ -106,7 +113,7 @@ def make_lid():
     # Camera bump runs in a channel open to the left edge so it can slide in.
     s = s.cut(Part.makeBox(PX + 33, 30, PLATE + 2, V(-1, PY + 2, zp - 1)))
     # Latch: cantilever tongue in the plate, ramped bump at its free (left) end holds the phone's left edge.
-    yc = PY + PPD - 15
+    yc = PY + PPD - PH_R - TONGUE_W / 2 - 3                         # on the straight part of the phone's edge
     for y in (yc - TONGUE_W / 2 - SLIT, yc + TONGUE_W / 2):
         s = s.cut(Part.makeBox(TONGUE_L + 1, SLIT, PLATE + 2, V(-1, y, zp - 1)))
     bx = PX + 2 * PH_CLR - 0.3

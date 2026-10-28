@@ -66,4 +66,5 @@ Assets in `render/assets/` are CC0 from Poly Haven.
 
 ## Status
 
-Not printed yet. `CORNER_R` is a safe placeholder of 7.0 mm until it is measured.
+Not printed yet. `CORNER_R` is an 11.5 mm estimate until it is measured with the gauge. If the keyboard or phone
+binds at the corners of the fit tests, lower it.
