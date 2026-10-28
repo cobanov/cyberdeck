@@ -1,0 +1,6 @@
+.DS_Store
+*.FCBak
+*.FCStd1
+*.blend1
+__pycache__/
+render/preview.png
