@@ -1,16 +1,34 @@
 # Cyberdeck render scene, built from the FreeCAD meshes and dims.json in this folder.
 # Room: oak desk + artist_workshop HDRI (CC0, Poly Haven, in assets/), same as the handheld-stand renders.
 # Live Blender:  exec(open("/Volumes/cobanov-ssd/Workspace/cyberdeck/render/scene.py").read(), {})
-# Render:        Blender -b -P scene.py -- --render [--preview]
+# Render:        Blender -b -P scene.py -- --render [--preview] [--slate] [shot ...]   (default: every shot in SHOTS)
+#                --slate renders the one-piece handheld from slate/ instead of the clamshell.
 import bpy, bmesh, json, math, os, sys
 from mathutils import Matrix, Vector
 
 DIR = "/Volumes/cobanov-ssd/Workspace/cyberdeck/render"
 S = 0.001                                    # FreeCAD mm -> Blender m
-C = json.load(open(os.path.join(DIR, "dims.json")))
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+MODEL = "slate" if "--slate" in ARGS else "cyberdeck"
+MD = os.path.join(DIR, "slate") if MODEL == "slate" else DIR   # meshes + dims.json; the slate is built face down
+C = json.load(open(os.path.join(MD, "dims.json")))
 PREVIEW = "--preview" in ARGS
-CAM_AZ, CAM_EL, CAM_DIST = 245, 16, 0.46    # degrees, degrees, metres
+# name: camera azimuth (from +X towards +Y; the deck faces -Y) and elevation in degrees, distance in metres,
+# focus target in mm, lens mm, f-stop, lid angle (None = open to the stop)
+SHOTS = {
+    "hero":    (245, 16, 0.46, (69, 60, 30), 60, 11, None),
+    "front":   (268, 20, 0.52, (69, 45, 40), 70, 11, None),
+    "profile": (182, 6, 0.50, (69, 60, 35), 70, 11, None),
+    "back":    (62, 24, 0.40, (69, 82, 22), 60, 8, None),
+    "closed":  (232, 32, 0.44, (69, 45, 14), 60, 11, 0),
+    "slot":    (200, 16, 0.26, (0, 96, 50), 85, 5.6, None),   # phone slot at the open lid's left end
+} if MODEL == "cyberdeck" else {
+    "hero":    (244, 34, 0.40, (69, 73, 7), 60, 11, None),
+    "top":     (270, 72, 0.52, (69, 73, 8), 60, 11, None),
+    "profile": (200, 10, 0.40, (69, 73, 7), 70, 11, None),
+    "back":    (60, 32, 0.50, (69, 73, 7), 60, 11, 0),             # flipped face down
+    "slot":    (196, 18, 0.24, (0, 108, 9), 85, 5.6, None),
+}
 HDRI_ROT = 260                              # stand renders' 110 deg, turned to this camera's heading
 
 
@@ -76,7 +94,7 @@ def link(o, mat=None):
 
 
 def stl(name, mat, bevel=0.0):
-    bpy.ops.wm.stl_import(filepath=os.path.join(DIR, name + ".stl"))
+    bpy.ops.wm.stl_import(filepath=os.path.join(MD, name + ".stl"))
     o = bpy.context.view_layer.objects.active
     o.name = name
     o.data.transform(Matrix.Scale(S, 4))   # bake mm->m into the mesh so bevel and texture scales are in metres
@@ -133,8 +151,8 @@ def text(body, size, loc, mat, rot=(0, 0, 0), align="CENTER"):
 # --- materials ---
 pla = material("PLA charcoal", (0.035, 0.036, 0.04), rough=0.55)
 bump(pla, layer_lines, 0.18, 0.00003)
-petg = material("PETG orange", (0.95, 0.30, 0.04), rough=0.32)
-bump(petg, layer_lines, 0.18, 0.00003)
+ruby = material("PLA ruby red", (0.40, 0.008, 0.02), rough=0.32)
+bump(ruby, layer_lines, 0.18, 0.00003)
 kb_plastic = material("Keyboard body", (0.02, 0.02, 0.022), rough=0.75)
 key_rim = material("Key rim", (0.55, 0.56, 0.58), rough=0.5)
 key_top = material("Key top", (0.012, 0.012, 0.014), rough=0.8)
@@ -177,7 +195,9 @@ nt.links.new(nm.outputs["Normal"], p.inputs["Normal"])
 desk.data.materials.append(oak)
 
 # --- base, keyboard, screws ---
-stl("base", pla, bevel=0.35)
+if MODEL == "cyberdeck":
+    stl("base", pla, bevel=0.35)
+before = set(bpy.data.objects)
 stl("kb_body", kb_plastic, bevel=0.6)
 KX, KY, KZ = C["WALL"] + C["KB_CLR"], C["WALL"] + C["KB_CLR"], C["FLOOR"] + C["KB_BODY"]
 CAP_H = C["KB_KEYS"] - C["KB_BODY"]
@@ -209,7 +229,8 @@ for r, row in enumerate(ROWS):
         if label:
             size = 3.4 if len(label) == 1 else (2.4 if len(label) <= 3 else 1.9)
             text(label, size, mm(cx, cy, KZ + CAP_H + 0.06), legend)
-for x0, x1 in [(0.5, 3.5), (C["W"] - 3.5, C["W"] - 0.5)]:
+kb_parts = [o for o in bpy.data.objects if o not in before]
+for x0, x1 in [(0.5, 3.5), (C["W"] - 3.5, C["W"] - 0.5)] if MODEL == "cyberdeck" else []:
     bpy.ops.mesh.primitive_cylinder_add(radius=2.75 * S, depth=(x1 - x0) * S, vertices=32,
                                         location=mm((x0 + x1) / 2, C["YA"], C["ZA"]), rotation=(0, math.pi / 2, 0))
     bpy.context.view_layer.objects.active.data.materials.append(steel)
@@ -219,7 +240,7 @@ hinge = bpy.data.objects.new("Hinge", None)
 col.objects.link(hinge)
 hinge.location = mm(0, C["YA"], C["ZA"])
 bpy.context.view_layer.update()
-lid_parts = [stl("lid", petg, bevel=0.35), stl("phone", phone_body, bevel=0.0)]
+lid_parts = [stl("lid" if MODEL == "cyberdeck" else "slate", ruby, bevel=0.35), stl("phone", phone_body, bevel=0.0)]
 
 SW, SD = 124.9, 57.6                                 # iPhone 12 mini active area
 pcx, pcy = C["PHONE_X"] + C["PH_W"] / 2, C["PHONE_Y"] + C["PH_D"] / 2
@@ -258,6 +279,11 @@ for o in lid_parts:
     o.parent = hinge
     o.matrix_parent_inverse = hinge.matrix_world.inverted()
 hinge.rotation_euler = (math.radians(-C["OPEN"]), 0, 0)
+if MODEL == "slate":   # the keyboard sits in the slate: it follows the body when a shot flips it face down
+    bpy.context.view_layer.update()
+    for o in kb_parts:
+        o.parent = hinge
+        o.matrix_parent_inverse = hinge.matrix_world.inverted()
 
 # --- room light (HDRI only, like the stand renders), camera ---
 world = bpy.data.worlds.new("Workshop")
@@ -277,17 +303,24 @@ bg.inputs["Strength"].default_value = 1.0
 
 target = bpy.data.objects.new("Target", None)       # focus point: hinge line, mid-width
 col.objects.link(target)
-target.location = mm(69, 60, 30)
-az, el = math.radians(CAM_AZ), math.radians(CAM_EL)  # az from +X towards +Y; the deck faces -Y
 cam_data = bpy.data.cameras.new("Camera")
-cam_data.lens = 60
 cam_data.dof.use_dof = True
 cam_data.dof.focus_object = target
-cam_data.dof.aperture_fstop = 11
 cam = link(bpy.data.objects.new("Camera", cam_data))
-cam.location = target.location + CAM_DIST * Vector((math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el)))
-cam.rotation_euler = (target.location - cam.location).to_track_quat("-Z", "Y").to_euler()
 scene.camera = cam
+
+
+def shot(name):
+    az, el, dist, tgt, lens, fstop, lid = SHOTS[name]
+    az, el = math.radians(az), math.radians(el)
+    target.location = mm(*tgt)
+    cam_data.lens, cam_data.dof.aperture_fstop = lens, fstop
+    cam.location = target.location + dist * Vector((math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el)))
+    cam.rotation_euler = (target.location - cam.location).to_track_quat("-Z", "Y").to_euler()
+    hinge.rotation_euler = (math.radians(-(C["OPEN"] if lid is None else lid)), 0, 0)
+
+
+shot("hero")
 
 # --- render settings ---
 scene.render.engine = "CYCLES"
@@ -311,6 +344,9 @@ if bpy.app.background and "--render" in ARGS:
     prefs.refresh_devices()
     for dev in prefs.devices:
         dev.use = True
-    scene.render.filepath = os.path.join(DIR, "preview.png" if PREVIEW else "cyberdeck_render.png")
-    bpy.ops.render.render(write_still=True)
+    for name in [a for a in ARGS if a in SHOTS] or list(SHOTS):
+        shot(name)
+        out = "cyberdeck_render.png" if (MODEL, name) == ("cyberdeck", "hero") else f"{MODEL}_{name}.png"
+        scene.render.filepath = os.path.join(DIR, ("preview_" + out) if PREVIEW else out)
+        bpy.ops.render.render(write_still=True)
 print("scene ready:", len(bpy.data.objects), "objects")

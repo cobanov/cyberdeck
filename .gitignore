@@ -3,4 +3,5 @@
 *.FCStd1
 *.blend1
 __pycache__/
-render/preview.png
+render/preview*.png
+gcode/
