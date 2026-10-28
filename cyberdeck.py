@@ -32,6 +32,8 @@ HR, HG, KG = 4.0, 0.5, 0.4      # knuckle radius, radial gap, axial gap
 K_BASE, K_LID = 7.0, 10.0
 FOOT = 14.0              # base extends this far behind the axis: lid stop + anti-tip
 M3_CLR, M3_TAP, M3_HEAD = 3.3, 2.7, 6.0
+M3_PIN = 3.1             # lid knuckle bore, snug on the screw shank so the lid can't rattle; ream with a 3 mm drill if tight
+MAG_D, MAG_H = 6.0, 2.0  # open lock: per hinge, a disc magnet in the lid knuckle's landing face meets one in the foot
 
 # Keyboard port/switch slots: (side, mm from keyboard's left edge (front/back) or front edge (left/right), width)
 KB_CUTOUTS = [("back", 28 - 7.5, 15)]   # USB-C on the back edge, centred ~28 mm from the left; slot fits the plug overmould
@@ -46,6 +48,9 @@ HL = PLATE + RING + PH_T + LIP_T
 YA, ZA = D + HR + HG, HB         # hinge axis
 Y_END = YA + FOOT
 OPEN = 180 - math.degrees(math.atan2(HL, HR + HG))   # lid's back-top edge lands on the foot here
+RAY = V(0, -(HR + HG), HL).normalize()               # axis -> lid's back-top edge: the face that lands on the foot
+NRM = V(0, RAY.z, -RAY.y)                            # that face's outward normal
+MAG_S = (HR + HG + math.hypot(HR + HG, HL)) / 2      # magnet centre's distance from the axis along the face
 PPW, PPD = PH_W + 2 * PH_CLR, PH_D + 2 * PH_CLR
 PX, PY = W - WALL_R - PPW, (D - PPD) / 2               # phone pocket origin in the lid
 
@@ -99,6 +104,7 @@ def make_base():
         else:
             clr, tap, head = (bi[1], W + 1), bi, (W - 3.5, W + 1)
         s = s.cut(xcyl(M3_CLR / 2, *clr)).cut(xcyl(M3_TAP / 2, *tap)).cut(xcyl(M3_HEAD / 2, *head))
+        s = s.cut(Part.makeCylinder(MAG_D / 2 + 0.1, MAG_H + 1.2, V(sum(li) / 2, YA + MAG_S, ZA - MAG_H - 0.2)))
     return s.removeSplitter()
 
 
@@ -130,7 +136,9 @@ def make_lid():
         tri = Part.makePolygon([V(li[0], D - 1, ZA), V(li[0], YA, ZA), V(li[0], D, ZA + HL),
                                 V(li[0], D - 1, ZA + HL), V(li[0], D - 1, ZA)])
         s = s.fuse(Part.Face(tri).extrude(V(li[1] - li[0], 0, 0))).fuse(xcyl(HR, *li))
-        s = s.cut(xcyl(M3_CLR / 2, li[0] - 1, li[1] + 1))
+        s = s.cut(xcyl(M3_PIN / 2, li[0] - 1, li[1] + 1))
+        mag = V(sum(li) / 2, YA, ZA) + RAY * MAG_S
+        s = s.cut(Part.makeCylinder(MAG_D / 2 + 0.1, MAG_H + 0.7, mag + NRM * 0.5, NRM * -1))
     return s.removeSplitter()
 
 
@@ -152,6 +160,10 @@ assert opened(lid, OPEN + 3).common(base).Volume > 0.01, "stop does not engage"
 assert kb.common(base).Volume < 0.01 and phone.common(lid).Volume < 0.01, "pocket too small"
 for dx, dz, what in [(-1.0, 0, "latch"), (0, -1.0, "lips"), (0, 1.0, "plate")]:
     assert phone.translated(V(dx, 0, dz)).common(lid).Volume > 0.01, f"phone not held by {what}"
+for left in (True, False):   # the lid's magnet lands on the foot's magnet at the stop
+    xm = sum(hinge_spans(left)[1]) / 2
+    m = App.Rotation(V(1, 0, 0), -OPEN).multVec(RAY * MAG_S) + V(xm, YA, ZA)
+    assert (m - V(xm, YA + MAG_S, ZA)).Length < 0.05, "magnets miss each other at the stop"
 
 if "Cyberdeck" in App.listDocuments():
     App.closeDocument("Cyberdeck")
