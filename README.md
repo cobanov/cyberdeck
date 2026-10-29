@@ -36,19 +36,20 @@ Both share the measurements and the slide-in phone bay in `deck.py`.
 
 ## Parts and print times
 
-Creality K1, the `PLA @K1 cobanov` preset (Elas PLA Pro values), 0.2 mm layers, 3 walls, 20 % gyroid
+Creality K1, the `PLA @K1 cobanov` preset (Elas PLA Pro values), 0.2 mm layers, 3 walls, 20 % gyroid, no brim or skirt
 (`slice_k1.sh`, OrcaSlicer estimates). Plates in print order:
 
 | File | What | Print | Time | PLA |
 |---|---|---|---|---|
-| `stl/radius_gauge.stl`, `stl/fit_phone.stl` | Corner radius gauge, 7–11.5 mm; left end of the phone bay | One plate, first: find `CORNER_R`, try the slide and click | 58 min | 22 g |
-| `stl/fit_keyboard.stl`, `stl/fit_slate_keyboard.stl` | Keyboard pocket slice; slate keyboard rim with lips, hooks and notch | One plate, before the base or the slate | 59 min | 33 g |
-| `stl/base.stl` | Clamshell: keyboard tray, hinge foot | Floor down, no supports | 1 h 15 min | 42 g |
-| `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 25 min | 38 g |
-| `stl/slate.stl` | Slate | Back down, no supports | 2 h 14 min | 77 g |
-| `stl/radius_gauge_case.stl`, `stl/radius_gauge_lid.stl` | Case for the gauge tiles, sliding lid | Upright and flat, no supports | 33 min | 15 g |
+| `stl/radius_gauge.stl`, `stl/fit_phone.stl` | Corner radius gauge, 7–11.5 mm; left end of the phone bay | One plate, first: find `CORNER_R`, try the slide and click | 51 min | 20 g |
+| `stl/fit_keyboard.stl`, `stl/fit_slate_keyboard.stl` | Keyboard pocket slice; slate keyboard rim with lips, hooks and notch | One plate, before the base or the slate | 56 min | 32 g |
+| `stl/base.stl` | Clamshell: keyboard tray, hinge foot | Floor down, no supports | 1 h 12 min | 41 g |
+| `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 24 min | 38 g |
+| `stl/slate.stl` | Slate | Back down, no supports | 2 h 10 min | 76 g |
+| `stl/radius_gauge_case.stl`, `stl/radius_gauge_lid.stl` | Case for the gauge tiles, sliding lid | Upright and flat, no supports | 32 min | 15 g |
 
-The clamshell is about 2 h 40 min and 80 g; the slate 2 h 15 min and 77 g. The frame's left end bridges the phone
+The clamshell is about 2 h 40 min and 79 g; the slate 2 h 10 min and 76 g. No part needs a brim or a skirt (the
+K1 draws its own purge line). The frame's left end bridges the phone
 slot, so keep the part cooling fan on; `fit_phone.stl` prints the same bridge first.
 
 ## Hardware
