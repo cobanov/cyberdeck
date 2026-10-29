@@ -13,6 +13,10 @@ MODEL = "slate" if "--slate" in ARGS else "cyberdeck"
 MD = os.path.join(DIR, "slate") if MODEL == "slate" else DIR   # meshes + dims.json; the slate is built face down
 C = json.load(open(os.path.join(MD, "dims.json")))
 PREVIEW = "--preview" in ARGS
+# An aspect like 9:16 renders portrait frames into aspect/: same horizontal view as the 3:2 shots, zoomed in a little,
+# so the taller frame adds room and desk instead of cropping the deck.
+ASPECT = next((tuple(map(int, a.split(":"))) for a in ARGS if ":" in a), None)
+ZOOM = {"profile": 1.5 if MODEL == "cyberdeck" else 1.0, "slot": 1.0}   # per shot in portrait frames, default 1.2
 # name: camera azimuth (from +X towards +Y; the deck faces -Y) and elevation in degrees, distance in metres,
 # focus target in mm, lens mm, f-stop, lid angle (None = open to the stop)
 SHOTS = {
@@ -314,7 +318,7 @@ def shot(name):
     az, el, dist, tgt, lens, fstop, lid = SHOTS[name]
     az, el = math.radians(az), math.radians(el)
     target.location = mm(*tgt)
-    cam_data.lens, cam_data.dof.aperture_fstop = lens, fstop
+    cam_data.lens, cam_data.dof.aperture_fstop = lens * (ZOOM.get(name, 1.2) if ASPECT else 1.0), fstop
     cam.location = target.location + dist * Vector((math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el)))
     cam.rotation_euler = (target.location - cam.location).to_track_quat("-Z", "Y").to_euler()
     hinge.rotation_euler = (math.radians(-(C["OPEN"] if lid is None else lid)), 0, 0)
@@ -327,7 +331,10 @@ scene.render.engine = "CYCLES"
 scene.cycles.device = "GPU"
 scene.cycles.samples = 48 if PREVIEW else 384
 scene.cycles.use_denoising = True
-scene.render.resolution_x, scene.render.resolution_y = (960, 640) if PREVIEW else (2400, 1600)
+LONG = 960 if PREVIEW else 2400
+aw, ah = ASPECT or (3, 2)
+scene.render.resolution_x, scene.render.resolution_y = (LONG, round(LONG * ah / aw)) if aw >= ah else (round(LONG * aw / ah), LONG)
+cam_data.sensor_fit = "HORIZONTAL"
 scene.render.resolution_percentage = 100
 scene.view_settings.view_transform = "AgX"
 scene.view_settings.exposure = 0.6
@@ -347,6 +354,8 @@ if bpy.app.background and "--render" in ARGS:
     for name in [a for a in ARGS if a in SHOTS] or list(SHOTS):
         shot(name)
         out = "cyberdeck_render.png" if (MODEL, name) == ("cyberdeck", "hero") else f"{MODEL}_{name}.png"
+        if ASPECT:
+            out = os.path.join("aspect", out.replace(".png", f"_{aw}x{ah}.png"))
         scene.render.filepath = os.path.join(DIR, ("preview_" + out) if PREVIEW else out)
         bpy.ops.render.render(write_still=True)
 print("scene ready:", len(bpy.data.objects), "objects")

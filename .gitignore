@@ -5,3 +5,6 @@
 __pycache__/
 render/preview*.png
 gcode/
+app/build/
+app/DeckTerm.xcodeproj/
+render/aspect/
