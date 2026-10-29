@@ -8,3 +8,4 @@ gcode/
 app/build/
 app/DeckTerm.xcodeproj/
 render/aspect/
+render/collage/

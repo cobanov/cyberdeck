@@ -31,6 +31,7 @@ SHOTS = {
     "top":     (270, 72, 0.52, (69, 73, 8), 60, 11, None),
     "profile": (200, 10, 0.40, (69, 73, 7), 70, 11, None),
     "back":    (60, 32, 0.50, (69, 73, 7), 60, 11, 0),             # flipped face down
+    "angle":   (300, 26, 0.40, (69, 73, 7), 60, 11, None),
     "slot":    (196, 18, 0.24, (0, 108, 9), 85, 5.6, None),
 }
 HDRI_ROT = 260                              # stand renders' 110 deg, turned to this camera's heading
