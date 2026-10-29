@@ -16,9 +16,9 @@ collage() {
   done
   x1=$((tw + G)) y1=$((th + G)) y2=$((2 * (th + G)))
   f+="[t0][t1][t2][t3][t4][t5]xstack=inputs=6:layout=0_0|${x1}_0|0_${y1}|${x1}_${y1}|0_${y2}|${x1}_${y2}:fill=0x101012,"
-  f+="pad=$W:$ch:$M:$M:color=0x101012"
-  ffmpeg -loglevel error -y "${in[@]}" -filter_complex "$f" -q:v 2 "$H/collage/${model}_${aw}x${ah}.jpg" &&
-    echo "collage/${model}_${aw}x${ah}.jpg ${W}x${ch}"
+  f+="pad=$W:$ch:$M:$M:color=0x101012,format=rgb24"   # PNG: phone galleries keep it as is"
+  ffmpeg -loglevel error -y "${in[@]}" -filter_complex "$f" "$H/collage/${model}_${aw}x${ah}.png" &&
+    echo "collage/${model}_${aw}x${ah}.png ${W}x${ch}"
 }
 for a in "2 3" "3 4" "9 16"; do
   collage cyberdeck $a render front closed back profile slot
