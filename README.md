@@ -41,16 +41,18 @@ Creality K1, the `PLA @K1 cobanov` preset (Elas PLA Pro values), 0.2 mm layers, 
 
 | File | What | Print | Time | PLA |
 |---|---|---|---|---|
-| `stl/radius_gauge.stl`, `stl/fit_phone.stl` | Corner radius gauge, 7–11.5 mm; left end of the phone bay | One plate, first: find `CORNER_R`, try the slide and click | 51 min | 20 g |
-| `stl/fit_keyboard.stl`, `stl/fit_slate_keyboard.stl` | Keyboard pocket slice; slate keyboard rim with lips, hooks and notch | One plate, before the base or the slate | 56 min | 32 g |
+| `stl/fit_keyboard.stl`, `stl/fit_phone.stl` | Clamshell: keyboard pocket slice; left end of the phone bay | One plate, before the base and lid: try the slide and click | 26 min | 10 g |
+| `stl/fit_slate_keyboard.stl` | Slate: keyboard rim with lips, hooks and notch | Back down, before the slate | 51 min | 30 g |
 | `stl/base.stl` | Clamshell: keyboard tray, hinge foot | Floor down, no supports | 1 h 12 min | 41 g |
-| `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 24 min | 38 g |
+| `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 25 min | 38 g |
 | `stl/slate.stl` | Slate | Back down, no supports | 2 h 10 min | 76 g |
+| `stl/radius_gauge.stl` | Corner radius gauge, 7–11.5 mm | Flat; only for a different keyboard or phone | 31 min | 13 g |
 | `stl/radius_gauge_case.stl`, `stl/radius_gauge_lid.stl` | Case for the gauge tiles, sliding lid | Upright and flat, no supports | 32 min | 15 g |
 
 The clamshell is about 2 h 40 min and 79 g; the slate 2 h 10 min and 76 g. No part needs a brim or a skirt (the
-K1 draws its own purge line). The frame's left end bridges the phone
-slot, so keep the part cooling fan on; `fit_phone.stl` prints the same bridge first.
+K1 draws its own purge line). The frame lips bridge 60–120 mm over the phone slot and sagged slightly on the part
+fan alone, so `slice_k1.sh` switches the side fan on for bridges only (it stays off otherwise, since it blows on the
+bed).
 
 ## Hardware
 
@@ -136,6 +138,7 @@ Assets in `render/assets/` are CC0 from Poly Haven.
 
 ## Status
 
-Not printed yet. `CORNER_R` is an 11.5 mm estimate until it is measured with the gauge. If the keyboard or phone
-binds at the corners of the fit tests, lower it. The slate's lips and hooks assume the key field starts 3 mm in from
+The radius gauge and the phone bay test are printed. `CORNER_R` is 10 mm, measured on both the keyboard and the
+iPhone 12 mini, and the phone fits the bay test. Its left-end lip sagged slightly, which the side fan on bridges
+should fix; check the lid's lips on the first full print. The slate's lips and hooks assume the key field starts 3 mm in from
 the keyboard's edge (`KB_INSET`); check that on the real keyboard before printing the slate.

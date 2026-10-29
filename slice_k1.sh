@@ -3,6 +3,7 @@
 # Profiles (inherits resolved, so the CLI can't fill gaps with its own defaults): profiles/k1_pla_filament.json
 # (the PLA @K1 cobanov preset, copied from the vault's 3d-print/profiles/cli/pla_k1_cobanov.json),
 # profiles/k1_base_process.json (no supports), profiles/k1_lid_process.json (tree supports under the hinge knuckles).
+# Each G-code then gets the side fan switched on for its bridges only.
 H=$(cd "$(dirname "$0")" && pwd)
 P=/Applications/OrcaSlicer.app/Contents/Resources/profiles/Creality
 O=/Applications/OrcaSlicer.app/Contents/MacOS/OrcaSlicer
@@ -16,6 +17,18 @@ sl() {
   [ -f "$t/plate_2.gcode" ] && { echo "$out: parts don't fit one plate"; exit 1; }
   if [ -f "$t/plate_1.gcode" ]; then
     f="$H/gcode/k1-pla/$out"; mv "$t/plate_1.gcode" "$f"
+    # Side fan (P2) only while bridging: on the part fan alone the frame lips' 60-120 mm bridges sag onto the screen,
+    # but the preset keeps the side fan off because it blows on the bed. All bridges here are 7 mm or more up.
+    python3 - "$f" <<'EOF'
+import sys
+p = sys.argv[1]; out = []; on = False
+for line in open(p):
+    if line.startswith(";TYPE:") and (line.strip() == ";TYPE:Bridge") != on:
+        on = not on
+        out.append("M106 P2 S255\n" if on else "M106 P2 S0\n")
+    out.append(line)
+open(p, "w").writelines(out)
+EOF
     for k in nozzle_temperature nozzle_temperature_initial_layer fan_min_speed additional_cooling_fan_speed filament_flow_ratio \
              pressure_advance filament_max_volumetric_speed filament_density cool_plate_temp_initial_layer; do
       want=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]][0])" "$H/profiles/k1_pla_filament.json" $k)
@@ -29,8 +42,9 @@ sl() {
 }
 sl base_PLA.gcode base "$H/stl/base.stl"
 sl lid_PLA.gcode lid "$H/stl/lid.stl"
-# First plate: radius gauge and the phone bay test (supports only under fit_phone's hinge knuckle).
-sl fit-phone-gauge_PLA.gcode lid "$H/stl/radius_gauge.stl" "$H/stl/fit_phone.stl"
-sl fit-keyboards_PLA.gcode base "$H/stl/fit_keyboard.stl" "$H/stl/fit_slate_keyboard.stl"
+# The clamshell's two fit tests on one plate (supports only under fit_phone's hinge knuckle), the slate's on its own.
+sl fit-tests_PLA.gcode lid "$H/stl/fit_keyboard.stl" "$H/stl/fit_phone.stl"
+sl fit-slate-keyboard_PLA.gcode base "$H/stl/fit_slate_keyboard.stl"
+sl radius-gauge_PLA.gcode base "$H/stl/radius_gauge.stl"
 sl radius-gauge-case_PLA.gcode base "$H/stl/radius_gauge_case.stl" "$H/stl/radius_gauge_lid.stl"
 sl slate_PLA.gcode base "$H/stl/slate.stl"

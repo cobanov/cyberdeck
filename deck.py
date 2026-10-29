@@ -12,7 +12,7 @@ KB_KEYS = 12.0           # housing + membrane keys
 KB_INSET = 3.0           # key field starts this far in from the housing edge (retainers grip the band outside it)
 PH_W, PH_D, PH_T = 131.5, 64.2, 7.4   # iPhone 12 mini, Apple spec
 PH_SCREEN = 124.9, 57.6  # its active area: 2340 x 1080 px at 476 ppi, so a 3.3 mm black border all round
-CORNER_R = 11.5          # keyboard and iPhone 12 mini share this corner radius; estimate, measure with stl/radius_gauge.stl
+CORNER_R = 10.0          # keyboard and iPhone 12 mini share this corner radius, both measured with stl/radius_gauge.stl
                          # too large binds the corners once it exceeds the real radius by ~1 mm; too small only leaves gaps
 
 # --- fit ---
