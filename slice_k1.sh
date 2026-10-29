@@ -22,6 +22,7 @@ sl() {
       grep -q "^; $k = $want\$" "$f" || { echo "$out: $k is not $want"; exit 1; }
     done
     echo "$out | $(grep -m1 'estimated printing time (normal mode)' "$f" | sed 's/.*= //') | $(grep -m1 '^; filament used \[g\]' "$f" | sed 's/.*= //') g"
+    rm -rf "$t"   # kept when slicing fails: its log.txt says why
   else
     echo "$out FAILED"; tail -3 "$t/log.txt"
   fi
