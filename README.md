@@ -41,6 +41,7 @@ Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid (`slice_k1.sh`, OrcaSlicer
 | File | What | Print | Time | PLA |
 |---|---|---|---|---|
 | `stl/radius_gauge.stl` | Corner radius gauge, 7–11.5 mm | Flat, first: find `CORNER_R` | 36 min | 14 g |
+| `stl/radius_gauge_case.stl`, `stl/radius_gauge_lid.stl` | Case for the gauge tiles, sliding lid | Upright and flat, no supports | 32 min | 14 g |
 | `stl/fit_keyboard.stl`, `stl/fit_phone.stl` | Keyboard pocket slice; left end of the phone bay | One plate, before the big parts | 28 min | 10 g |
 | `stl/base.stl` | Clamshell: keyboard tray, hinge foot | Floor down, no supports | 1 h 9 min | 40 g |
 | `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 20 min | 36 g |

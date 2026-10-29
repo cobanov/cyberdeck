@@ -1,5 +1,5 @@
 #!/bin/bash
-# Slice the printable parts (clamshell, slate, fit tests) for a Creality K1 with generic PLA into gcode/k1-pla/.
+# Slice the printable parts (clamshell, slate, fit tests, radius gauge and its case) for a Creality K1 with generic PLA into gcode/k1-pla/.
 # Profiles (inherits resolved, so the CLI can't fill gaps with its own defaults): profiles/k1_pla_filament.json,
 # profiles/k1_base_process.json (no supports), profiles/k1_lid_process.json (tree supports under the hinge knuckles).
 H=$(cd "$(dirname "$0")" && pwd)
@@ -27,5 +27,6 @@ sl base_PLA.gcode base "$H/stl/base.stl"
 sl lid_PLA.gcode lid "$H/stl/lid.stl"
 sl fit-tests_PLA.gcode lid "$H/stl/fit_keyboard.stl" "$H/stl/fit_phone.stl"
 sl radius-gauge_PLA.gcode base "$H/stl/radius_gauge.stl"
+sl radius-gauge-case_PLA.gcode base "$H/stl/radius_gauge_case.stl" "$H/stl/radius_gauge_lid.stl"
 sl slate_PLA.gcode base "$H/stl/slate.stl"
 sl fit-slate-keyboard_PLA.gcode base "$H/stl/fit_slate_keyboard.stl"
