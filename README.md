@@ -93,6 +93,36 @@ exec(open("/Volumes/cobanov-ssd/Workspace/cyberdeck/slate.py").read(), {})
 This rebuilds the `.FCStd` files, the STLs and the render meshes. Then `./slice_k1.sh` writes G-code to
 `gcode/k1-pla/`; it refuses a file whose filament settings don't match `profiles/k1_pla_filament.json`.
 
+## Terminal app
+
+`app/` is DeckTerm, a small SSH terminal for the phone in the lid. It runs in landscape only. The Bluetooth keyboard
+types, so the on-screen keyboard stays hidden until the keyboard key in the bar brings it up. Saved devices show as
+cards; tap one, or press ⌘1–9, to open its terminal (⌘N adds a device). A thin bar under the terminal holds the
+connection status and the keys a small keyboard lacks (esc, tab, ^C, arrows). Hold a finger on the terminal and slide
+it to send arrow keys. Swipe in from the left edge to go back to the list, from the right edge for the panel:
+snippets (tap runs one, a long press pastes or deletes it), the font (JetBrains Mono, Fira Code, IBM Plex Mono, SF
+Mono, Menlo), its size, and the theme (One Dark, Darcula, Catppuccin, Dracula, Gruvbox, Nord, Tokyo Night, Solarized
+and three black ones), which colors the whole app. ⌘W goes back, ⌘= and ⌘- resize the text, ⌘, opens the panel. The
+bundled fonts are SIL OFL; their licenses sit beside them in `app/DeckTerm/Fonts/`.
+
+One private key serves every device: run `pbcopy < ~/.ssh/id_ed25519` on the Mac and paste it under the key button.
+A device with a password uses that instead. Host keys are pinned on first connect, and a changed key is refused.
+
+The `…` menu above the cards exports a backup (`deckterm-yedek.json`: devices, pinned host keys, theme, font, snippets)
+and restores one, also from the first-launch screen. Passwords and the private key stay out of it, since the file may
+end up in Files or iCloud; paste the key once on the new phone. A restore adds or replaces devices by id and never
+overwrites a host key the phone has already pinned.
+
+```sh
+cd app && xcodegen generate      # then open DeckTerm.xcodeproj, or:
+scripts/release.sh install       # Ad Hoc build onto the iPhone 12 mini over USB
+scripts/release.sh testflight    # upload to TestFlight
+```
+
+The tests log into this Mac's own sshd (Remote Login on) with `~/.ssh/id_ed25519`:
+`xcodebuild test -scheme DeckTerm -destination 'platform=iOS Simulator,name=iPhone 17' -skipPackagePluginValidation`.
+To get Control or Escape on Caps Lock, use iOS Settings → General → Keyboard → Hardware Keyboard → Modifier Keys.
+
 ## Render
 
 `render/scene.py` builds the scene in Blender 5.2 (Cycles): the deck on an oak desk lit by the `artist_workshop`
