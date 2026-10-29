@@ -14,7 +14,7 @@ Both share the measurements and the slide-in phone bay in `deck.py`.
 ## Highlights
 
 - **Matched footprints.** The keyboard (133 × 68 mm) and the phone (131.5 × 64.2 mm) are almost the same size. The
-  clamshell closes to 138 × 91 × 25.5 mm; the slate is 138 × 147 × 14.3 mm.
+  clamshell closes to 138 × 91 × 25.5 mm; the slate is 138 × 147 × 14.4 mm.
 - **Slide-in phone, one-piece frame.** The phone slides in from the left between the back plate and a lip that runs
   all the way round the screen. The lip covers 1 mm of the phone's 3.3 mm black border, never the screen. A flexing
   tongue in the plate clicks in behind the phone, and the camera bump slides along a groove into its own window. The
@@ -25,10 +25,14 @@ Both share the measurements and the slide-in phone bay in `deck.py`.
   magnets snap it there: no wobble, and taps on the screen push into the stop. Pull the lid forward to close it.
   A channel through the foot fits a USB-C plug to charge the keyboard in place.
 - **Slate holds the keyboard without glue.** It tilts in under two fixed lips at the spacebar edge and clicks past
-  two snap hooks at the top edge. Two windows in the back push it out again.
+  two snap hooks at the top edge. Each hook sits on an 18 mm arm that bends sideways, along the printed layers,
+  at under 1 % strain. Two windows in the back push the keyboard out again.
+- **Made to print.** Every part prints in one piece; only the lid's two hinge knuckles need supports. The frame's
+  left end bridges the 65 mm phone slot one layer above the side lips, so the slicer spans it wall to wall. Every
+  flexing part bends along its layers, and the phone bay's heights sit on layer lines.
 - **Self-checking.** The scripts assert that the lid swings clear up to the stop and the stop engages, that the
   keyboard and phone fit, and that each is held on every side. The phone must also slide out with only the latch
-  in its way.
+  in its way. The latch and hook arms stay under 1 % strain, and the hook arms are free to bend.
 
 ## Parts and print times
 
@@ -39,12 +43,12 @@ Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid (`slice_k1.sh`, OrcaSlicer
 | `stl/radius_gauge.stl` | Corner radius gauge, 7–11.5 mm | Flat, first: find `CORNER_R` | 36 min | 14 g |
 | `stl/fit_keyboard.stl`, `stl/fit_phone.stl` | Keyboard pocket slice; left end of the phone bay | One plate, before the big parts | 28 min | 10 g |
 | `stl/base.stl` | Clamshell: keyboard tray, hinge foot | Floor down, no supports | 1 h 9 min | 40 g |
-| `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 20 min | 37 g |
-| `stl/fit_slate_keyboard.stl` | Slate: keyboard rim with lips, hooks and notch | Back down, no supports | 47 min | 29 g |
-| `stl/slate.stl` | Slate | Back down, no supports | 2 h 0 min | 73 g |
+| `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 20 min | 36 g |
+| `stl/fit_slate_keyboard.stl` | Slate: keyboard rim with lips, hooks and notch | Back down, no supports | 48 min | 29 g |
+| `stl/slate.stl` | Slate | Back down, no supports | 2 h 1 min | 73 g |
 
-The clamshell is about 2.5 hours and 77 g; the slate 2 hours and 73 g. The frame's left end bridges the phone
-slot, so keep the part cooling fan on.
+The clamshell is about 2.5 hours and 76 g; the slate 2 hours and 73 g. The frame's left end bridges the phone
+slot, so keep the part cooling fan on; `fit_phone.stl` prints the same bridge first.
 
 ## Hardware
 

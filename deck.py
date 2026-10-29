@@ -21,9 +21,11 @@ WALL, FLOOR, PLATE = 2.0, 2.0, 2.0
 KEY_GAP = 0.3            # rim above key tops: edge keys stay easy to press
 RING = 0.6               # MagSafe steel ring sticker behind the phone (0 if none)
 EDGE_R = 1.0             # outer edges
+LAYER = 0.2              # print layer height: the phone bay's heights sit on layer lines (the lid is 56 layers)
 
 # --- phone slides in from the left on rails, a flexing tongue in the plate latches it ---
 LIP, LIP_T = 1.0, 1.2    # frame lip over the screen's black border, lip thickness
+LIP_STEP = LAYER         # lip's left end starts one layer higher, so the slicer bridges it wall to wall on its own
 WALL_R = 2.0             # closed right end (Lightning side)
 TONGUE_L, TONGUE_W, SLIT = 25.0, 10.0, 1.0
 BUMP_H = 2.0             # latch bump height above the plate; catches RING-less phone edge by BUMP_H - RING
@@ -38,6 +40,8 @@ PX, PY = W - WALL_R - PPW, (D - PPD) / 2               # phone pocket origin in 
 PHONE_X, PHONE_Y = PX + PPW - PH_W, (D - PH_D) / 2     # phone slid home against the right end
 YC = PY + PPD - PH_R - TONGUE_W / 2 - 3               # latch tongue centre, on the straight part of the phone's edge
 assert LIP + PH_CLR < (PH_D - PH_SCREEN[1]) / 2, "frame lip reaches the active screen"
+assert 1.5 * PLATE * BUMP_H / TONGUE_L ** 2 < 0.01, "latch tongue strained past 1 % (PLA)"
+assert all(abs(h / LAYER - round(h / LAYER)) < 1e-6 for h in (LIP_T, PH_T + RING, HL)), "phone bay heights off layer lines"
 
 
 def rbox(w, d, h, r, x=0, y=0, z=0, r_back=None):
@@ -78,6 +82,9 @@ def phone_bay(s, z0, back):
     s = s.cut(Part.makeLoft([rrect(ww + 2 * c, wd + 2 * c, wr + c, wx - c, wy - c, z0 - 0.01),
                              rrect(ww, wd, wr, wx, wy, z0 + c)], True, True))
     s = s.cut(rbox(ww, wd, LIP_T + 1, wr, wx, wy, z0 + c - 0.1))
+    # Over the open slot the lip is a 65 mm bridge. On the same layer as the side lips the slicer hangs it from them
+    # in short strands; one layer up it spans wall to wall, and the step leaves room for sag.
+    s = s.cut(Part.makeBox(wx + 1, PPD, LIP_STEP + 0.01, V(-1, PY, z0 + LIP_T - LIP_STEP)))
     # Landscape, camera end on the user's left: y=0 is the phone's top edge.
     # Camera bump slides in along a groove in the plate, then sits in a window so the camera still sees.
     # Neither reaches the left end, so the plate's end stays whole.
@@ -89,12 +96,15 @@ def phone_bay(s, z0, back):
     for y in (YC - TONGUE_W / 2 - SLIT, YC + TONGUE_W / 2):
         s = s.cut(Part.makeBox(TONGUE_L, SLIT, thru, V(x0, y, zp - 1)))
     s = s.cut(Part.makeBox(SLIT, TONGUE_W + 2 * SLIT, thru, V(x0, YC - TONGUE_W / 2 - SLIT, zp - 1)))
-    if back - zp > PLATE + 1e-6:   # thicker plate: thin the tongue from the back so it still flexes
-        s = s.cut(rbox(TONGUE_L + 4, TONGUE_W + 2 * SLIT + 2, back - zp - PLATE + 1, 2,
-                       x0, YC - TONGUE_W / 2 - SLIT - 1, zp + PLATE))
+    zt = back - PLATE                                                    # tongue's phone-side face
+    if zt > zp + 1e-6:   # thicker plate: recess the tongue from the phone's side, so it flexes and still prints on the bed
+        s = s.cut(rbox(TONGUE_L + 4, TONGUE_W + 2 * SLIT + 2, zt - zp + 0.01, 2, x0, YC - TONGUE_W / 2 - SLIT - 1, zp))
+        x1 = x0 + TONGUE_L + 4                                           # 45 deg far end: the phone's edge rides out
+        ramp = Part.makePolygon([V(x1, 0, zp - 0.01), V(x1 + zt - zp, 0, zp - 0.01), V(x1, 0, zt), V(x1, 0, zp - 0.01)])
+        s = s.cut(Part.Face(ramp).extrude(V(0, TONGUE_W + 2 * SLIT + 2, 0)).translate(V(0, YC - TONGUE_W / 2 - SLIT - 1, 0)))
     x0, bx = x0 + SLIT, PX + 2 * PH_CLR - 0.3
-    bump = Part.makePolygon([V(x0, 0, zp + 0.5), V(x0, 0, zp), V(bx, 0, zp - BUMP_H), V(bx, 0, zp + 0.5),
-                             V(x0, 0, zp + 0.5)])
+    bump = Part.makePolygon([V(x0, 0, zt + 0.5), V(x0, 0, zp), V(bx, 0, zp - BUMP_H), V(bx, 0, zt + 0.5),
+                             V(x0, 0, zt + 0.5)])
     s = s.fuse(Part.Face(bump).extrude(V(0, TONGUE_W, 0)).translate(V(0, YC - TONGUE_W / 2, 0)))
     # Buttons: relief grooves so sliding in doesn't press them; the side button gets a flared window.
     for y in (PY - 0.8, PY + PPD - 0.5):
