@@ -1,12 +1,12 @@
 # Corner radius gauge for the keyboard (same radius as the iPhone 12 mini): press the corner into each
 # tile's inside corner; the right one touches along the whole arc and both straight edges with no light gap.
 # Smaller radius: the corner sits clear of the straight edges. Larger: light shows at the middle of the arc.
-# Run inside FreeCAD: exec(open("/Volumes/cobanov-ssd/Workspace/cyberdeck/radius_gauge.py").read(), {})
+# Run inside FreeCAD: exec(open("/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck/radius_gauge.py").read(), {})
 import os
 import FreeCAD as App, Part, MeshPart, Draft
 from FreeCAD import Vector as V
 
-DIR = "/Volumes/cobanov-ssd/Workspace/cyberdeck"
+DIR = "/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck"
 RADII = [7.0 + 0.5 * i for i in range(10)]          # 7.0 .. 11.5 mm
 TILE, LEG, T, GAP = 30.0, 9.0, 2.4, 4.0
 FONT = "/System/Library/Fonts/Monaco.ttf"

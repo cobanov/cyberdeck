@@ -1,12 +1,12 @@
 # Slate: one-piece 2DS-style handheld. The iPhone 12 mini slides into the top half on the same rails and latch as the
 # clamshell lid; the keyboard tilts into the bottom half under two fixed lips and clicks in past two snap hooks.
-# Run inside FreeCAD: exec(open("/Volumes/cobanov-ssd/Workspace/cyberdeck/slate.py").read(), {})
+# Run inside FreeCAD: exec(open("/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck/slate.py").read(), {})
 # Modelled face down in deck.py's frame (screen face at z=0, y=0 the top edge); printed back down, no supports.
 import json, os
 import FreeCAD as App, Part, MeshPart
 from FreeCAD import Vector as V
 
-DIR = "/Volumes/cobanov-ssd/Workspace/cyberdeck"
+DIR = "/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck"
 exec(open(os.path.join(DIR, "deck.py")).read(), globals())   # measured parts, fits, phone bay
 
 # --- keyboard retention: tilt in under the lips at the spacebar edge, click past the hooks at the top edge ---

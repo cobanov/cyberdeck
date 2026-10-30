@@ -1,11 +1,11 @@
 # Cyberdeck clamshell: mini BT keyboard (base) + iPhone 12 mini (lid).
-# Run inside FreeCAD: exec(open("/Volumes/cobanov-ssd/Workspace/cyberdeck/cyberdeck.py").read(), {})
+# Run inside FreeCAD: exec(open("/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck/cyberdeck.py").read(), {})
 # Frame: x = width (left->right), y = front->back, z = up. Lid is modelled closed, then opened via Placement.
 import json, os
 import FreeCAD as App, Part, MeshPart
 from FreeCAD import Vector as V
 
-DIR = "/Volumes/cobanov-ssd/Workspace/cyberdeck"
+DIR = "/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck"
 
 exec(open(os.path.join(DIR, "deck.py")).read(), globals())   # measured parts, fits, phone bay
 
