@@ -8,7 +8,7 @@ from FreeCAD import Vector as V
 # --- measured / spec (mm) ---
 KB_W, KB_D = 133.0, 68.0
 KB_BODY = 9.5            # plastic housing
-KB_KEYS = 12.0           # housing + membrane keys
+KB_KEYS = 11.0           # housing + membrane keys: they stand 1.5 mm proud (measured; 12.0 was a guess)
 KB_INSET = 3.0           # key field starts this far in from the housing edge (retainers grip the band outside it)
 PH_W, PH_D, PH_T = 131.5, 64.2, 7.4   # iPhone 12 mini, Apple spec
 PH_SCREEN = 124.9, 57.6  # its active area: 2340 x 1080 px at 476 ppi, so a 3.3 mm black border all round
@@ -71,8 +71,9 @@ def port(l, h, centre, inward, along, depth, flare=1.0, flare_h=None):
     return Part.makeLoft(wires, True, True).transformed(m)
 
 
-def phone_bay(s, z0, back):
-    """Cut the slide-in phone bay into s over the W x D footprint at the origin: screen face at z0, back face at back."""
+def phone_bay(s, z0, back, latch=True, lead=0.0):
+    """Cut the slide-in phone bay into s over the W x D footprint at the origin: screen face at z0, back face at back.
+    Without the latch the phone is held only by its snug fit; lead > 0 flares the open end by that much at 45 deg."""
     zp = z0 + LIP_T + PH_T + RING                                       # plate inner face
     zm = z0 + LIP_T + PH_T / 2                                           # phone mid-thickness: buttons, Lightning
     thru = back - zp + 2                                                 # cuts through the plate
@@ -95,29 +96,35 @@ def phone_bay(s, z0, back):
     # suspect for the phone stopping short of the right end.
     s = s.cut(rbox(PX + 35 + 10, 30, PLATE - 0.6 + 1, 6, -10, PY + 2, zp - 1))
     s = s.cut(rbox(PX + 35 - PHONE_X - 1, 30, thru, 6, PHONE_X + 1, PY + 2, zp - 1))
-    # Latch: cantilever tongue in the plate, free end just inside a strip at the left end; a ramped bump there
-    # holds the phone's left edge. Release: push the bump up through the open end.
-    x0 = 1.2
-    for y in (YC - TONGUE_W / 2 - SLIT, YC + TONGUE_W / 2):
-        s = s.cut(Part.makeBox(TONGUE_L, SLIT, thru, V(x0, y, zp - 1)))
-    s = s.cut(Part.makeBox(SLIT, TONGUE_W + 2 * SLIT, thru, V(x0, YC - TONGUE_W / 2 - SLIT, zp - 1)))
-    zt = back - PLATE                                                    # tongue's phone-side face
-    if zt > zp + 1e-6:   # thicker plate: recess the tongue from the phone's side, so it flexes and still prints on the bed
-        s = s.cut(rbox(TONGUE_L + 4, TONGUE_W + 2 * SLIT + 2, zt - zp + 0.01, 2, x0, YC - TONGUE_W / 2 - SLIT - 1, zp))
-        x1 = x0 + TONGUE_L + 4                                           # 45 deg far end: the phone's edge rides out
-        ramp = Part.makePolygon([V(x1, 0, zp - 0.01), V(x1 + zt - zp, 0, zp - 0.01), V(x1, 0, zt), V(x1, 0, zp - 0.01)])
-        s = s.cut(Part.Face(ramp).extrude(V(0, TONGUE_W + 2 * SLIT + 2, 0)).translate(V(0, YC - TONGUE_W / 2 - SLIT - 1, 0)))
-    x0, bx = x0 + SLIT, PX + 2 * PH_CLR - 0.3
-    bump = Part.makePolygon([V(x0, 0, zt + 0.5), V(x0, 0, zp), V(bx, 0, zp - BUMP_H), V(bx, 0, zt + 0.5),
-                             V(x0, 0, zt + 0.5)])
-    s = s.fuse(Part.Face(bump).extrude(V(0, TONGUE_W, 0)).translate(V(0, YC - TONGUE_W / 2, 0)))
+    if latch:
+        # Latch: cantilever tongue in the plate, free end just inside a strip at the left end; a ramped bump there
+        # holds the phone's left edge. Release: push the bump up through the open end.
+        x0 = 1.2
+        for y in (YC - TONGUE_W / 2 - SLIT, YC + TONGUE_W / 2):
+            s = s.cut(Part.makeBox(TONGUE_L, SLIT, thru, V(x0, y, zp - 1)))
+        s = s.cut(Part.makeBox(SLIT, TONGUE_W + 2 * SLIT, thru, V(x0, YC - TONGUE_W / 2 - SLIT, zp - 1)))
+        zt = back - PLATE                                                    # tongue's phone-side face
+        if zt > zp + 1e-6:   # thicker plate: recess the tongue from the phone's side, so it flexes and still prints on the bed
+            s = s.cut(rbox(TONGUE_L + 4, TONGUE_W + 2 * SLIT + 2, zt - zp + 0.01, 2, x0, YC - TONGUE_W / 2 - SLIT - 1, zp))
+            x1 = x0 + TONGUE_L + 4                                           # 45 deg far end: the phone's edge rides out
+            ramp = Part.makePolygon([V(x1, 0, zp - 0.01), V(x1 + zt - zp, 0, zp - 0.01), V(x1, 0, zt), V(x1, 0, zp - 0.01)])
+            s = s.cut(Part.Face(ramp).extrude(V(0, TONGUE_W + 2 * SLIT + 2, 0)).translate(V(0, YC - TONGUE_W / 2 - SLIT - 1, 0)))
+        x0, bx = x0 + SLIT, PX + 2 * PH_CLR - 0.3
+        bump = Part.makePolygon([V(x0, 0, zt + 0.5), V(x0, 0, zp), V(bx, 0, zp - BUMP_H), V(bx, 0, zt + 0.5),
+                                 V(x0, 0, zt + 0.5)])
+        s = s.fuse(Part.Face(bump).extrude(V(0, TONGUE_W, 0)).translate(V(0, YC - TONGUE_W / 2, 0)))
     # Buttons: relief grooves so sliding in doesn't press them; the side button gets a flared window.
     for y in (PY - 0.8, PY + PPD - 0.5):
         s = s.cut(Part.makeBox(PX + 63, 1.3, 4, V(-1, y, zm - 2)))
-    # Volume buttons: the window's ends ramp at ~45 deg so a fingertip slides in (a straight pit was hard to reach);
-    # across the wall it flares only 1.2 mm, which keeps 1.2 mm of wall at the screen face.
+    # Top-edge button window (the side key, camera end on the left): its ends ramp at ~45 deg so a fingertip slides in
+    # (a straight pit was hard to reach); across the wall it flares only 1.2 mm, keeping 1.2 mm of wall at the screen face.
     s = s.cut(port(47, 5, V(PX + 38.5, -0.01, zm), V(0, 1, 0), V(1, 0, 0), PY + 0.5, 4.0, 1.2))
     s = s.cut(port(30, 6.4, V(W + 0.01, D / 2, zm), V(-1, 0, 0), V(0, 1, 0), WALL_R + 0.5, 0.6))   # Lightning + speakers
+    if lead:   # rails and plate, then the camera groove's sides (its floor leaves too little plate); the 1 mm lip stays
+        for y0, y1, za, zb, zf in ((PY, PY + PPD, z0 + LIP_T, zp, 1), (PY + 2, PY + 32, zp - 1, zp + PLATE - 0.6, 0)):
+            rect = lambda x, e: Part.makePolygon([V(x, y0 - e, za), V(x, y1 + e, za), V(x, y1 + e, zb + zf * e),
+                                                  V(x, y0 - e, zb + zf * e), V(x, y0 - e, za)])
+            s = s.cut(Part.makeLoft([rect(-0.01, lead + 0.01), rect(lead, 0)], True, True))
     return s
 
 
@@ -125,17 +132,17 @@ def phone_in_bay(z0):
     return rbox(PH_W, PH_D, PH_T, CORNER_R, PHONE_X, PHONE_Y, z0 + LIP_T)
 
 
-def check_phone(s, z0):
-    """Self-check: the phone fits the bay, is held by latch, lips and plate, and only the latch is in its way out."""
+def check_phone(s, z0, latch=True):
+    """Self-check: the phone fits the bay, is held by lips and plate (and the latch), and nothing else is in its way out."""
     ph = phone_in_bay(z0)
     assert ph.common(s).Volume < 0.01, "phone pocket too small"
-    for dx, dz, what in [(-1.0, 0, "latch"), (0, -1.0, "lips"), (0, 1.0, "plate")]:
+    for dx, dz, what in [(-1.0, 0, "latch")] * latch + [(0, -1.0, "lips"), (0, 1.0, "plate")]:
         assert ph.translated(V(dx, 0, dz)).common(s).Volume > 0.01, f"phone not held by {what}"
     zp = z0 + LIP_T + PH_T + RING
-    latch = Part.makeBox(TONGUE_L + 1, TONGUE_W, BUMP_H + 1, V(-1, YC - TONGUE_W / 2, zp - BUMP_H))
+    stop = Part.makeBox(TONGUE_L + 1, TONGUE_W, BUMP_H + 1, V(-1, YC - TONGUE_W / 2, zp - BUMP_H))
     for dx in (20, 60, 100):
         hit = ph.translated(V(-dx, 0, 0)).common(s)
-        assert hit.Volume - hit.common(latch).Volume < 0.01, f"phone snags {dx} mm out"
+        assert hit.Volume - (hit.common(stop).Volume if latch else 0) < 0.01, f"phone snags {dx} mm out"
     return ph
 
 

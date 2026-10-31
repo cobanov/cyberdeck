@@ -13,56 +13,79 @@
 <meta property="og:image" content="https://cyberdeck.cobanov.dev/img/cyberdeck_render-960.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000000">
+<link rel="preload" href="/fonts/JetBrainsMono-Bold.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="icon" href="data:,">
 <style>
+/* Theme: DeckTerm's, since the phone runs it. Layout, spacing and footer follow runyard.cobanov.dev. */
 @font-face { font-family: "JetBrains Mono"; src: url("/fonts/JetBrainsMono-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
 :root {
-  --bg: #000; --fg: #e6e6e6; --accent: #3ce882; --surface: #101010; --raised: #202020; --line: #2b2b2b; --muted: #a0a0a0;
-  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color-scheme: dark;
+  --paper: #000; --panel: #101010; --soft: #202020; --ink: #e6e6e6; --muted: #a0a0a0; --rule: #2b2b2b; --accent: #3ce882;
+  --radius: 8px; --radius-sm: 6px;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
-*, *::before, *::after { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 400 1.0625rem/1.6 var(--sans); overflow-wrap: break-word; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 var(--sans); font-variant-numeric: tabular-nums; overflow-wrap: break-word; }
 img { display: block; max-width: 100%; height: auto; }
-a { color: var(--accent); text-underline-offset: 0.18em; }
+a { color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-h1, h2 { font-family: var(--mono); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0; }
-h1 { font-size: clamp(2rem, 1.4rem + 3vw, 3.4rem); }
-h2 { font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2rem); }
-p { margin: 0; }
-.wrap { max-width: 72rem; margin: 0 auto; padding: 0 max(16px, 4vw); }
-header { display: flex; justify-content: space-between; align-items: center; padding-block: 1.25rem; font-family: var(--mono); font-weight: 700; }
-header a { color: var(--fg); text-decoration: none; }
-header nav { display: flex; gap: 1.25rem; font-size: 0.95rem; }
-header nav a { color: var(--muted); }
-header nav a:hover { color: var(--fg); }
-.hero { padding-block: 2.5rem 1.5rem; display: grid; gap: 1rem; }
-.hero, section { grid-template-columns: minmax(0, 1fr); }   /* the wide table scrolls instead of widening the page */
-.lede { color: var(--muted); max-width: 40rem; font-size: 1.15rem; }
-section { padding-block: 2rem; display: grid; gap: 1.25rem; }
-.tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.tabs button, .hinge button { font: 700 0.9rem var(--mono); color: var(--fg); background: var(--raised); border: 1px solid var(--line); border-radius: 8px; padding: 0.5rem 0.85rem; cursor: pointer; }
-.hinge { display: flex; align-items: center; gap: 0.75rem; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+header { display: flex; align-items: center; gap: 16px; padding: 20px 0; }
+.brand { font: 700 1.25rem var(--mono); letter-spacing: -0.02em; text-decoration: none; }
+.brand span { color: var(--accent); }
+nav { margin-left: auto; display: flex; gap: 20px; font-size: 0.9375rem; }
+nav a { text-decoration: none; color: var(--muted); }
+nav a:hover { color: var(--ink); }
+@media (max-width: 480px) { nav { gap: 14px; } nav .wide { display: none; } }
+.hero { padding: 56px 0 32px; }
+@media (max-width: 760px) { .hero { padding-top: 32px; } }
+h1, h2 { font-family: var(--mono); font-weight: 700; text-wrap: balance; }
+h1 { font-size: clamp(2.125rem, 5.5vw, 3.25rem); line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 16px; }
+h2 { font-size: clamp(1.5rem, 3vw, 1.875rem); letter-spacing: -0.02em; margin: 0 0 8px; }
+.lede { font-size: 1.1875rem; color: var(--muted); margin: 0 0 28px; max-width: 40ch; text-wrap: pretty; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-block; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--rule); background: var(--panel); text-decoration: none; font-size: 0.9375rem; font-weight: 600; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+section { margin-bottom: 72px; }
+.sub { color: var(--muted); margin: 0 0 24px; font-size: 1.0625rem; }
+.note { color: var(--muted); font-size: 0.875rem; margin: 12px 0 0; }
+.note a, .sub a { color: var(--accent); }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.tabs button, .hinge button { font: 600 0.875rem var(--sans); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer; }
+.tabs button:hover, .hinge button:hover { border-color: var(--muted); }
+.tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #000; }
+.viewer { position: relative; height: clamp(320px, 62vh, 640px); background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; touch-action: none; }
+.viewer canvas { display: block; width: 100%; height: 100%; }
+.status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; color: var(--muted); font-size: 0.875rem; display: flex; justify-content: space-between; gap: 16px; pointer-events: none; }
+.status a { pointer-events: auto; color: var(--accent); }
+.hinge { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
 .hinge[hidden] { display: none; }
 .hinge input { flex: 1; min-width: 0; accent-color: var(--accent); }
 #deg { font-family: var(--mono); min-width: 3.2em; text-align: right; color: var(--muted); }
-.tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #000; }
-.viewer { position: relative; height: clamp(320px, 62vh, 640px); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; touch-action: none; }
-.viewer canvas { display: block; width: 100%; height: 100%; }
-.status { position: absolute; inset: auto 0 0 0; padding: 0.75rem 1rem; color: var(--muted); font-size: 0.9rem; display: flex; justify-content: space-between; gap: 1rem; pointer-events: none; }
-.status a { pointer-events: auto; }
-.caption { color: var(--muted); }
-table { width: 100%; border-collapse: collapse; font-size: 0.97rem; }
-th, td { text-align: left; padding: 0.7rem 0.75rem 0.7rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { color: var(--muted); font-weight: 600; }
+/* The table scrolls inside its frame on a phone; the page never does. */
+.table { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--panel); }
+table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 0.9375rem; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tbody tr:last-child > * { border-bottom: 0; }
+th { color: var(--muted); font-weight: 600; font-size: 0.875rem; }
 td:first-child { font-family: var(--mono); white-space: nowrap; }
-.table { overflow-x: auto; }
-.builds { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
-.builds img { border-radius: 12px; }
-figure { margin: 0; display: grid; gap: 0.5rem; }
-figcaption { color: var(--muted); font-size: 0.95rem; }
-footer { padding-block: 2.5rem; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); margin-top: 2rem; }
+td a { color: var(--accent); }
+.builds { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+figure { margin: 0; display: grid; gap: 8px; }
+.builds img { border: 1px solid var(--rule); border-radius: var(--radius); }
+figcaption { color: var(--muted); font-size: 0.9375rem; }
+footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top: 24px; }
+.foot { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; padding: 40px 0 32px; font-size: 0.9375rem; }
+@media (max-width: 760px) { .foot { grid-template-columns: repeat(2, 1fr); } .foot .about { grid-column: 1 / -1; } }
+.foot h3 { margin: 0 0 10px; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.foot a, .legal a { text-decoration: none; }
+.foot a:hover, .legal a:hover { text-decoration: underline; }
+.about .brand { display: inline-block; margin-bottom: 10px; }
+.about p { margin: 0 0 6px; color: var(--muted); max-width: 30ch; }
+.legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 16px 0 28px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.875rem; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -74,21 +97,28 @@ footer { padding-block: 2.5rem; color: var(--muted); font-size: 0.9rem; border-t
 <body>
 <div class="wrap">
 <header>
-  <a href="/">Cyberdeck</a>
-  <nav aria-label="Links">
-    <a href="https://github.com/cobanov/cyberdeck">Source</a>
-    <a href="https://deckterm.cobanov.dev">DeckTerm app</a>
+  <a class="brand" href="/">cyberdeck<span>_</span></a>
+  <nav aria-label="Main">
+    <a href="#models">Models</a>
+    <a href="#files" class="wide">Files</a>
+    <a href="https://deckterm.cobanov.dev">DeckTerm</a>
+    <a href="https://github.com/cobanov/cyberdeck">GitHub</a>
   </nav>
 </header>
 
 <main>
   <div class="hero">
     <h1>A pocket deck you can print.</h1>
-    <p class="lede">An iPhone 12 mini and a Torima M7 mini Bluetooth keyboard in a 3D-printed shell: a clamshell with a hinged lid, or a one-piece slate. Turn the models here and download the STL files.</p>
+    <p class="lede">An iPhone 12 mini and a mini Bluetooth keyboard in a 3D-printed shell: a clamshell with a hinged lid, or a one-piece slate.</p>
+    <div class="actions">
+      <a class="btn primary" href="#files">Download the STL files</a>
+      <a class="btn" href="https://github.com/cobanov/cyberdeck#readme">Read the build notes</a>
+    </div>
   </div>
 
   <section aria-labelledby="models">
     <h2 id="models">Models</h2>
+    <p class="sub">Drag to turn, scroll or pinch to zoom, right-drag or two fingers to move.</p>
     <div class="tabs" role="group" aria-label="Model">
       <button data-view="clamshell" aria-pressed="true">Clamshell, assembled</button>
       <button data-view="base">Base</button>
@@ -105,46 +135,83 @@ footer { padding-block: 2.5rem; color: var(--muted); font-size: 0.9rem; border-t
       <input id="angle" type="range" min="0" max="112" step="0.5" aria-label="Lid angle">
       <span id="deg"></span>
     </div>
-    <p class="caption">Drag to turn, scroll or pinch to zoom, right-drag or two fingers to move.</p>
   </section>
 
   <section aria-labelledby="files">
     <h2 id="files">Files</h2>
-    <p class="caption">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. Only the lid needs supports, under its two hinge knuckles. Assembly, hardware and print notes are in the <a href="https://github.com/cobanov/cyberdeck#readme">README</a>.</p>
+    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles, the slate under its frame lips.</p>
     <div class="table">
       <table>
         <thead><tr><th>File</th><th>What</th><th>Print</th></tr></thead>
         <tbody>
           <tr><td><a href="/models/stl/base.stl" download>base.stl</a></td><td>Clamshell: keyboard tray and hinge</td><td>Floor down, no supports</td></tr>
           <tr><td><a href="/models/stl/lid.stl" download>lid.stl</a></td><td>Clamshell: slide-in phone bay and hinge knuckles</td><td>Back plate down, tree supports under the knuckles</td></tr>
-          <tr><td><a href="/models/stl/fit_keyboard.stl" download>fit_keyboard.stl</a><br><a href="/models/stl/fit_phone.stl" download>fit_phone.stl</a></td><td>Clamshell fit tests: a slice of the keyboard pocket, the left end of the phone bay</td><td>Before the base and lid, to try the fit</td></tr>
-          <tr><td><a href="/models/stl/slate.stl" download>slate.stl</a></td><td>Slate: phone on top, keyboard below, one piece</td><td>Back down, no supports</td></tr>
-          <tr><td><a href="/models/stl/fit_slate_keyboard.stl" download>fit_slate_keyboard.stl</a></td><td>Slate fit test: keyboard rim with lips and hooks</td><td>Back down, before the slate</td></tr>
+          <tr><td><a href="/models/stl/fit_keyboard.stl" download>fit_keyboard.stl</a><br><a href="/models/stl/fit_phone.stl" download>fit_phone.stl</a></td><td>Fit tests: a slice of the keyboard pocket, the left end of the clamshell's phone bay</td><td>Before the full parts, to try the fit</td></tr>
+          <tr><td><a href="/models/stl/slate.stl" download>slate.stl</a></td><td>Slate: phone on top, keyboard below, one piece</td><td>Back down, tree supports under the frame lips (allowed on the part, not only the bed)</td></tr>
           <tr><td><a href="/models/stl/radius_gauge.stl" download>radius_gauge.stl</a></td><td>Corner radius gauge, 7–11.5 mm, for a different phone or keyboard</td><td>Flat</td></tr>
           <tr><td><a href="/models/stl/radius_gauge_case.stl" download>radius_gauge_case.stl</a><br><a href="/models/stl/radius_gauge_lid.stl" download>radius_gauge_lid.stl</a></td><td>Case and sliding lid for the gauge tiles</td><td>Upright and flat, no supports</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="caption">Every measurement is a named parameter in Python scripts that build the models in FreeCAD. To fit another phone or keyboard, change the numbers and run them again: see <a href="https://github.com/cobanov/cyberdeck#customizing">Customizing</a>.</p>
+    <p class="note">Every measurement is a named parameter in Python scripts that build the models in FreeCAD. To fit another phone or keyboard, change the numbers and run them again: see <a href="https://github.com/cobanov/cyberdeck#customizing">Customizing</a>.</p>
   </section>
 
   <section aria-labelledby="builds">
     <h2 id="builds">Two builds</h2>
+    <p class="sub">The same phone and keyboard, hinged or flat.</p>
     <div class="builds">
       <figure>
         <img src="/img/cyberdeck_render-960.jpg" width="960" height="640" loading="lazy" alt="A red and black clamshell deck, open on a wooden table: an iPhone in the lid shows a terminal, a compact keyboard sits in the base.">
-        <figcaption>Clamshell: the lid holds the phone and opens to 112°.</figcaption>
+        <figcaption>Clamshell: 138 × 81 × 24.5 mm closed, the lid opens to 112°.</figcaption>
       </figure>
       <figure>
         <img src="/img/slate_hero-960.jpg" width="960" height="640" loading="lazy" alt="A flat red one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
-        <figcaption>Slate: the same parts in one flat piece.</figcaption>
+        <figcaption>Slate: one flat piece, 138 × 140 × 11.6 mm.</figcaption>
       </figure>
     </div>
   </section>
 </main>
-
-<footer>Designed and printed by <a href="https://github.com/cobanov">Mert Cobanov</a>. The phone runs <a href="https://deckterm.cobanov.dev">DeckTerm</a>.</footer>
 </div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="about">
+        <a class="brand" href="/">cyberdeck<span>_</span></a>
+        <p>A pocket deck you can print.</p>
+        <p>Free STL files and the FreeCAD scripts that make them.</p>
+      </div>
+      <div>
+        <h3>Models</h3>
+        <ul>
+          <li><a href="#models">3D viewer</a></li>
+          <li><a href="#files">Files</a></li>
+          <li><a href="#builds">Two builds</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Build it</h3>
+        <ul>
+          <li><a href="https://github.com/cobanov/cyberdeck#parts-and-print-times">Print settings</a></li>
+          <li><a href="https://github.com/cobanov/cyberdeck#assembly">Assembly</a></li>
+          <li><a href="https://github.com/cobanov/cyberdeck#customizing">Customizing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Get it</h3>
+        <ul>
+          <li><a href="https://github.com/cobanov/cyberdeck">GitHub</a></li>
+          <li><a href="https://deckterm.cobanov.dev">DeckTerm app</a></li>
+          <li><a href="https://github.com/cobanov/cyberdeck/issues">Issues</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>Made by <a href="https://cobanov.dev">Mert Cobanov</a></span>
+      <span>Printed and tested on a Creality K1 in PLA.</span>
+    </div>
+  </div>
+</footer>
 
 <script type="module">
 import * as THREE from 'three';
