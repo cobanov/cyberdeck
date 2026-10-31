@@ -7,3 +7,5 @@ render/preview*.png
 gcode/
 render/aspect/
 render/collage/
+site/public/models/
+site/.wrangler/
