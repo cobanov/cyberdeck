@@ -114,6 +114,9 @@ Assets in `render/assets/` are CC0 from Poly Haven.
 ## Status
 
 The radius gauge and the phone bay test are printed. `CORNER_R` is 10 mm, measured on both the keyboard and the
-iPhone 12 mini, and the phone fits the bay test. Its left-end lip sagged slightly, which the side fan on bridges
-should fix; check the lid's lips on the first full print. The slate's lips and hooks assume the key field starts 3 mm in from
+iPhone 12 mini, and the phone fits the bay test. The first full lid (2026-10-31) printed cleanly with the side fan on
+bridges and holds the phone, but the phone stopped 1-2 mm short of the closed right end: a thin strip of its frame showed
+there and the latch bump only half caught its left edge. The next lid gives the bay's right-end corners 2 mm less radius
+and the camera groove 2 mm more length, the two places that could stop it, and ramps the volume-button window's ends so a
+fingertip reaches the buttons. The base is unchanged, so a base printed now fits both lids. The slate's lips and hooks assume the key field starts 3 mm in from
 the keyboard's edge (`KB_INSET`); check that on the real keyboard before printing the slate.

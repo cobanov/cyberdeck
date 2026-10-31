@@ -60,9 +60,11 @@ def rrect(w, d, r, x, y, z):
     return min(rbox(w, d, 1, r, x, y, z).Faces, key=lambda f: f.CenterOfMass.z).OuterWire
 
 
-def port(l, h, centre, inward, along, depth, flare=1.0):
-    """Stadium window l x h through a wall, flaring by `flare` per side at the outer face."""
-    wires = [rrect(l + 2 * f, h + 2 * f, (h / 2 + f) * 0.999, -l / 2 - f, -h / 2 - f, z) for f, z in ((flare, 0), (0, depth))]
+def port(l, h, centre, inward, along, depth, flare=1.0, flare_h=None):
+    """Stadium window l x h through a wall, flaring by `flare` per side at the outer face (`flare_h` across h, if given)."""
+    fh = flare if flare_h is None else flare_h
+    wires = [rrect(l + 2 * f, h + 2 * g, (h / 2 + g) * 0.999, -l / 2 - f, -h / 2 - g, z)
+             for f, g, z in ((flare, fh, 0), (0, 0, depth))]
     ay = inward.cross(along)
     m = App.Matrix(along.x, ay.x, inward.x, centre.x, along.y, ay.y, inward.y, centre.y,
                    along.z, ay.z, inward.z, centre.z, 0, 0, 0, 1)
@@ -74,8 +76,10 @@ def phone_bay(s, z0, back):
     zp = z0 + LIP_T + PH_T + RING                                       # plate inner face
     zm = z0 + LIP_T + PH_T / 2                                           # phone mid-thickness: buttons, Lightning
     thru = back - zp + 2                                                 # cuts through the plate
-    # Rail channel open at the left end (rbox starts off-part so the left corners vanish).
-    s = s.cut(rbox(PX + PPW + 10, PPD, zp - z0 - LIP_T, PH_R, -10, PY, z0 + LIP_T))
+    # Rail channel open at the left end (rbox starts off-part so the left corners vanish). Its closed end's corners are
+    # 2 mm tighter than the phone's: on the first lid the phone stopped 1-2 mm short of this end, and a tighter corner
+    # can't bind, it only leaves a gap under the lip.
+    s = s.cut(rbox(PX + PPW + 10, PPD, zp - z0 - LIP_T, CORNER_R - 2, -10, PY, z0 + LIP_T))
     # Screen window: the lip runs all the way round as one frame, chamfered towards the screen.
     # The phone slides in above the lip's left end, so closing the frame there costs nothing.
     wx, wy, ww, wd, wr, c = PHONE_X + LIP, PHONE_Y + LIP, PH_W - 2 * LIP, PH_D - 2 * LIP, CORNER_R - LIP, 0.6
@@ -87,9 +91,10 @@ def phone_bay(s, z0, back):
     s = s.cut(Part.makeBox(wx + 1, PPD, LIP_STEP + 0.01, V(-1, PY, z0 + LIP_T - LIP_STEP)))
     # Landscape, camera end on the user's left: y=0 is the phone's top edge.
     # Camera bump slides in along a groove in the plate, then sits in a window so the camera still sees.
-    # Neither reaches the left end, so the plate's end stays whole.
-    s = s.cut(rbox(PX + 33 + 10, 30, PLATE - 0.6 + 1, 6, -10, PY + 2, zp - 1))
-    s = s.cut(rbox(PX + 33 - PHONE_X - 1, 30, thru, 6, PHONE_X + 1, PY + 2, zp - 1))
+    # Neither reaches the left end, so the plate's end stays whole. Both run 2 mm past the bump (35, was 33), the other
+    # suspect for the phone stopping short of the right end.
+    s = s.cut(rbox(PX + 35 + 10, 30, PLATE - 0.6 + 1, 6, -10, PY + 2, zp - 1))
+    s = s.cut(rbox(PX + 35 - PHONE_X - 1, 30, thru, 6, PHONE_X + 1, PY + 2, zp - 1))
     # Latch: cantilever tongue in the plate, free end just inside a strip at the left end; a ramped bump there
     # holds the phone's left edge. Release: push the bump up through the open end.
     x0 = 1.2
@@ -109,7 +114,9 @@ def phone_bay(s, z0, back):
     # Buttons: relief grooves so sliding in doesn't press them; the side button gets a flared window.
     for y in (PY - 0.8, PY + PPD - 0.5):
         s = s.cut(Part.makeBox(PX + 63, 1.3, 4, V(-1, y, zm - 2)))
-    s = s.cut(port(47, 5, V(PX + 38.5, -0.01, zm), V(0, 1, 0), V(1, 0, 0), PY + 0.5))
+    # Volume buttons: the window's ends ramp at ~45 deg so a fingertip slides in (a straight pit was hard to reach);
+    # across the wall it flares only 1.2 mm, which keeps 1.2 mm of wall at the screen face.
+    s = s.cut(port(47, 5, V(PX + 38.5, -0.01, zm), V(0, 1, 0), V(1, 0, 0), PY + 0.5, 4.0, 1.2))
     s = s.cut(port(30, 6.4, V(W + 0.01, D / 2, zm), V(-1, 0, 0), V(0, 1, 0), WALL_R + 0.5, 0.6))   # Lightning + speakers
     return s
 
