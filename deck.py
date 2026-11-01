@@ -71,6 +71,11 @@ def port(l, h, centre, inward, along, depth, flare=1.0, flare_h=None):
     return Part.makeLoft(wires, True, True).transformed(m)
 
 
+def screen_window(z, h):
+    """The frame's screen window, inside the lip, as a solid from z to z + h."""
+    return rbox(PH_W - 2 * LIP, PH_D - 2 * LIP, h, CORNER_R - LIP, PHONE_X + LIP, PHONE_Y + LIP, z)
+
+
 def phone_bay(s, z0, back, latch=True, lead=0.0):
     """Cut the slide-in phone bay into s over the W x D footprint at the origin: screen face at z0, back face at back.
     Without the latch the phone is held only by its snug fit; lead > 0 flares the open end by that much at 45 deg."""
@@ -86,7 +91,7 @@ def phone_bay(s, z0, back, latch=True, lead=0.0):
     wx, wy, ww, wd, wr, c = PHONE_X + LIP, PHONE_Y + LIP, PH_W - 2 * LIP, PH_D - 2 * LIP, CORNER_R - LIP, 0.6
     s = s.cut(Part.makeLoft([rrect(ww + 2 * c, wd + 2 * c, wr + c, wx - c, wy - c, z0 - 0.01),
                              rrect(ww, wd, wr, wx, wy, z0 + c)], True, True))
-    s = s.cut(rbox(ww, wd, LIP_T + 1, wr, wx, wy, z0 + c - 0.1))
+    s = s.cut(screen_window(z0 + c - 0.1, LIP_T + 1))
     # Over the open slot the lip is a 65 mm bridge. On the same layer as the side lips the slicer hangs it from them
     # in short strands; one layer up it spans wall to wall, and the step leaves room for sag.
     s = s.cut(Part.makeBox(wx + 1, PPD, LIP_STEP + 0.01, V(-1, PY, z0 + LIP_T - LIP_STEP)))

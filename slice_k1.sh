@@ -3,8 +3,8 @@
 # Profiles (inherits resolved, so the CLI can't fill gaps with its own defaults): profiles/k1_pla_filament.json
 # (the PLA @K1 cobanov preset, copied from the vault's 3d-print/profiles/cli/pla_k1_cobanov.json),
 # profiles/k1_base_process.json (no supports), profiles/k1_lid_process.json (tree supports under the hinge knuckles),
-# profiles/k1_slate_process.json (tree supports on the part too, under the frame lips, which sagged without them; the
-# topmost surface, the screen face, ironed).
+# profiles/k1_slate_process.json (no supports: slate.stl's one-layer skin over the screen window carries the frame lips;
+# the topmost surface, the screen face, ironed).
 # Each G-code then gets the side fan switched on for its bridges only.
 H=$(cd "$(dirname "$0")" && pwd)
 P=/Applications/OrcaSlicer.app/Contents/Resources/profiles/Creality
