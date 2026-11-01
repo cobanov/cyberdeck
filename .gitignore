@@ -3,7 +3,7 @@
 *.FCStd1
 *.blend1
 __pycache__/
-render/preview*.png
+render/*.png
 gcode/
 render/aspect/
 render/collage/

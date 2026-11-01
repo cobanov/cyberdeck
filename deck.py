@@ -13,7 +13,6 @@ KB_INSET = 3.0           # key field starts this far in from the housing edge (r
 # Keyboard port/switch slots: (side, mm from keyboard's left edge (front/back) or front edge (left/right), width)
 KB_CUTOUTS = [("back", 28 - 7.5, 15)]   # USB-C on the back edge, centred ~28 mm from the left; slot fits the plug overmould
 PH_W, PH_D, PH_T = 131.5, 64.2, 7.4   # iPhone 12 mini, Apple spec
-PH_SCREEN = 124.9, 57.6  # its active area: 2340 x 1080 px at 476 ppi, so a 3.3 mm black border all round
 CORNER_R = 10.0          # keyboard and iPhone 12 mini share this corner radius, both measured with stl/radius_gauge.stl
                          # too large binds the corners once it exceeds the real radius by ~1 mm; too small only leaves gaps
 
@@ -26,9 +25,7 @@ EDGE_R = 1.0             # outer edges
 LAYER = 0.2              # print layer height: the phone pocket's heights sit on layer lines
 
 
-# --- the phone drops in face up; its own MagSafe magnets hold it to the ring sticker ---
-# Until 2026-11-01 it slid in from the left under a frame lip, and a flexing tongue latched it (clamshell) or nothing did
-# (slate). The slate's phone loosened once its print burrs wore off, and the frame lips needed bridges, skins or supports.
+# --- the phone drops in screen out; its own MagSafe magnets hold it to the ring sticker ---
 RING_D = 58.0            # ring recess diameter: common stickers are 56 mm across; measure yours
 MAG_DX, MAG_DY = 0.0, 0.0   # ring centre from the phone's centre (the Apple logo); stick the ring on the phone, where its
                             # magnets centre it, and measure if it sits off-centre

@@ -1,14 +1,14 @@
 # Slate: one-piece 2DS-style handheld. The iPhone 12 mini drops face up into an open pocket in the top half, its screen
 # flush with the face, and its own MagSafe magnets hold it to a steel ring sticker in the pocket's floor; the keyboard
 # presses into the bottom half like the clamshell base. No latch, no rails, no frame over the screen.
-# Run inside FreeCAD: exec(open("/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck/slate.py").read(), {})
+# Run: freecadcmd slate.py, or in FreeCAD's console: p = "<repo>/slate.py"; exec(open(p).read(), {"__file__": p})
 # Modelled face down in deck.py's frame (screen face at z=0, y=0 the top edge); printed back down with no supports:
 # everything opens towards the face or goes through the back.
 import json, os
 import FreeCAD as App, Part, MeshPart
 from FreeCAD import Vector as V
 
-DIR = "/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck"
+DIR = os.path.dirname(os.path.abspath(__file__))
 exec(open(os.path.join(DIR, "deck.py")).read(), globals())   # measured parts, fits, the MagSafe phone pocket
 
 # The phone's half is only as deep as the phone pocket needs; deck.py's pocket functions read the PY, PHONE_Y set here.
@@ -73,7 +73,7 @@ for name, shape, color, transp in [("Body", slate, (0.61, 0.07, 0.12), 0), ("Key
 doc.recompute()
 doc.saveAs(os.path.join(DIR, "slate.FCStd"))
 
-# STL in print orientation: back down, no supports (the slid-in version's frame needed skins and supports; this has none).
+# STL in print orientation: back down, no supports.
 slate_p = slate.copy()
 slate_p.rotate(V(0, 0, 0), V(1, 0, 0), 180)
 slate_p.translate(V(0, L, T))   # exactly the face-up frame the site's viewer shows (BoundBox is loose round fillets)

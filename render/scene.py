@@ -1,6 +1,6 @@
 # Cyberdeck render scene, built from the FreeCAD meshes and dims.json in this folder.
 # Room: oak desk + artist_workshop HDRI (CC0, Poly Haven, in assets/), same as the handheld-stand renders.
-# Live Blender:  exec(open("/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck/render/scene.py").read(), {})
+# Live Blender:  p = "<repo>/render/scene.py"; exec(open(p).read(), {"__file__": p})
 # Render:        Blender -b -P scene.py -- --render [--preview] [--slate] [shot ...]   (default: every shot in SHOTS)
 #                --slate renders the one-piece handheld from slate/ instead of the clamshell.
 #                --color=white|mint|black prints the lid or slate in that PLA (default red) into colors/;
@@ -8,7 +8,7 @@
 import bpy, bmesh, json, math, os, sys
 from mathutils import Matrix, Vector
 
-DIR = "/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck/render"
+DIR = os.path.dirname(os.path.abspath(__file__))
 S = 0.001                                    # FreeCAD mm -> Blender m
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 MODEL = "slate" if "--slate" in ARGS else "cyberdeck"
