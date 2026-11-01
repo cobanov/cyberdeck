@@ -48,5 +48,3 @@ sl fit-keyboard_PLA.gcode base "$H/stl/fit_keyboard.stl"
 sl radius-gauge_PLA.gcode base "$H/stl/radius_gauge.stl"
 sl radius-gauge-case_PLA.gcode base "$H/stl/radius_gauge_case.stl" "$H/stl/radius_gauge_lid.stl"
 sl slate_PLA.gcode slate "$H/stl/slate.stl"
-# The site viewer's supports, read back out of the G-code just written.
-python3 "$H/render/supports.py" "$H/gcode/k1-pla/lid_PLA.gcode" "$H/stl/lid.stl" "$H/render/supports/lid.bin"

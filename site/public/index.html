@@ -10,7 +10,7 @@
 <meta property="og:title" content="Cyberdeck: a pocket deck you can print">
 <meta property="og:description" content="An iPhone and a mini keyboard in a 3D-printed clamshell or slate. Free STL files.">
 <meta property="og:url" content="https://cyberdeck.cobanov.dev/">
-<meta property="og:image" content="https://cyberdeck.cobanov.dev/img/cyberdeck_render-red-960.jpg">
+<meta property="og:image" content="https://cyberdeck.cobanov.dev/img/cyberdeck_render-mint-960.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="/fonts/JetBrainsMono-Bold.ttf" as="font" type="font/ttf" crossorigin>
@@ -20,7 +20,7 @@
 @font-face { font-family: "JetBrains Mono"; src: url("/fonts/JetBrainsMono-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
 :root {
   color-scheme: dark;
-  --paper: #000; --panel: #101010; --soft: #202020; --ink: #e6e6e6; --muted: #a0a0a0; --rule: #2b2b2b; --accent: #3ce882;
+  --paper: #000; --panel: #101010; --soft: #202020; --ink: #e6e6e6; --muted: #a0a0a0; --rule: #2b2b2b; --accent: #94deba;
   --radius: 8px; --radius-sm: 6px;
   --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -32,13 +32,13 @@ a { color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
 header { display: flex; align-items: center; gap: 16px; padding: 20px 0; }
-.brand { font: 700 1.25rem var(--mono); letter-spacing: -0.02em; text-decoration: none; }
+.brand { font: 700 1.25rem var(--mono); text-decoration: none; }
 .brand span { color: var(--accent); }
 nav { margin-left: auto; display: flex; gap: 20px; font-size: 0.9375rem; }
 nav a { text-decoration: none; color: var(--muted); }
 nav a:hover { color: var(--ink); }
 @media (max-width: 480px) { nav { gap: 14px; } nav .wide { display: none; } }
-.hero { padding: 56px 0 32px; }
+.hero { padding: 56px 0 56px; }
 @media (max-width: 760px) { .hero { padding-top: 32px; } }
 h1, h2 { font-family: var(--mono); font-weight: 700; text-wrap: balance; }
 h1 { font-size: clamp(2.125rem, 5.5vw, 3.25rem); line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 16px; }
@@ -52,19 +52,23 @@ section { margin-bottom: 72px; }
 .sub { color: var(--muted); margin: 0 0 24px; font-size: 1.0625rem; }
 .note { color: var(--muted); font-size: 0.875rem; margin: 12px 0 0; }
 .note a, .sub a { color: var(--accent); }
-.bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 16px; margin-bottom: 12px; }
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
-.colors { display: flex; gap: 10px; }
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-width: 520px; margin: 0 auto 16px; padding: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius); }
+.modes button { display: grid; gap: 2px; padding: 8px 12px; border: 0; border-radius: 4px; background: none; color: var(--ink); font: 600 1rem var(--sans); cursor: pointer; transition: background-color .15s, color .15s; }
+.modes small { font-size: 0.8125rem; font-weight: 400; color: var(--muted); }
+.modes button:hover { background: var(--soft); }
+.modes button[aria-pressed="true"] { background: var(--accent); color: #000; }
+.modes button[aria-pressed="true"] small { color: #1c3a2c; }
+.controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; margin-top: 12px; }
+.colors { display: flex; gap: 12px; margin-left: auto; }
 .colors button { width: 26px; height: 26px; padding: 0; border-radius: 50%; background: var(--c); border: 1px solid var(--muted); cursor: pointer; }
 .colors button[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 3px; }
-.tabs button, .hinge button { font: 600 0.875rem var(--sans); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer; }
-.tabs button:hover, .hinge button:hover { border-color: var(--muted); }
-.tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #000; }
+.hinge button { font: 600 0.875rem var(--sans); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer; }
+.hinge button:hover { border-color: var(--muted); }
 .viewer { position: relative; height: clamp(320px, 62vh, 640px); background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; touch-action: none; }
 .viewer canvas { display: block; width: 100%; height: 100%; }
 .status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; color: var(--muted); font-size: 0.875rem; display: flex; justify-content: space-between; gap: 16px; pointer-events: none; }
 .status a { pointer-events: auto; color: var(--accent); }
-.parts { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; }
+.parts { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .parts[hidden] { display: none; }
 .parts label { display: flex; align-items: center; gap: 8px; font-size: 0.9375rem; cursor: pointer; }
 .parts input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
@@ -87,7 +91,7 @@ figcaption { color: var(--muted); font-size: 0.9375rem; }
 footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top: 24px; }
 .foot { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; padding: 40px 0 32px; font-size: 0.9375rem; }
 @media (max-width: 760px) { .foot { grid-template-columns: repeat(2, 1fr); } .foot .about { grid-column: 1 / -1; } }
-.foot h3 { margin: 0 0 10px; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.foot h3 { margin: 0 0 12px; font-size: 0.875rem; font-weight: 500; color: var(--muted); }
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .foot a, .legal a { text-decoration: none; }
 .foot a:hover, .legal a:hover { text-decoration: underline; }
@@ -124,29 +128,41 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
     </div>
   </div>
 
+  <section aria-labelledby="builds">
+    <h2 id="builds">Two builds</h2>
+    <p class="sub">The same phone and keyboard, hinged or flat.</p>
+    <div class="builds">
+      <figure>
+        <img src="/img/cyberdeck_render-mint-960.jpg" width="960" height="640" alt="A clamshell deck, open on a wooden table: an iPhone in the lid shows a terminal, a compact keyboard sits in the base.">
+        <figcaption>Clamshell: 138 × 81 × 24.5 mm closed, the lid opens to 112°.</figcaption>
+      </figure>
+      <figure>
+        <img src="/img/slate_hero-mint-960.jpg" width="960" height="640" alt="A flat one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
+        <figcaption>Slate: one flat piece, 138 × 141 × 13.4 mm.</figcaption>
+      </figure>
+    </div>
+  </section>
+
   <section aria-labelledby="models">
     <h2 id="models">Models</h2>
     <p class="sub">Drag to turn, scroll or pinch to zoom, right-drag or two fingers to move.</p>
-    <div class="bar">
-      <div class="tabs" role="group" aria-label="Model">
-        <button data-view="clamshell" aria-pressed="true">Clamshell, assembled</button>
-        <button data-view="base">Base</button>
-        <button data-view="lid">Lid</button>
-        <button data-view="slate">Slate</button>
-        <button data-view="gauge">Radius gauge</button>
-      </div>
-      <div class="colors" role="group" aria-label="Colour">
-        <button data-color="red" aria-pressed="true" aria-label="Red" title="Red" style="--c:#a3162b"></button>
-        <button data-color="white" aria-label="White" title="White" style="--c:#e4e4e0"></button>
-        <button data-color="mint" aria-label="Mint" title="Mint" style="--c:#94deba"></button>
-        <button data-color="black" aria-label="Black" title="Black" style="--c:#2a2a2f"></button>
-      </div>
+    <div class="modes" role="group" aria-label="Build">
+      <button data-view="clamshell" aria-pressed="true">Clamshell<small>Hinged lid, closes over the keys</small></button>
+      <button data-view="slate" aria-pressed="false">Slate<small>One flat piece</small></button>
     </div>
     <div class="viewer" id="viewer">
       <div class="status"><span id="status">Loading…</span><span id="download"></span></div>
       <noscript><p style="padding:1rem">The 3D view needs JavaScript. The STL files are listed below.</p></noscript>
     </div>
-    <div class="parts" id="parts" role="group" aria-label="Parts shown" hidden></div>
+    <div class="controls">
+      <div class="parts" id="parts" role="group" aria-label="Parts shown" hidden></div>
+      <div class="colors" role="group" aria-label="Colour">
+        <button data-color="mint" aria-pressed="true" aria-label="Mint" title="Mint" style="--c:#94deba"></button>
+        <button data-color="red" aria-pressed="false" aria-label="Red" title="Red" style="--c:#a3162b"></button>
+        <button data-color="white" aria-pressed="false" aria-label="White" title="White" style="--c:#e4e4e0"></button>
+        <button data-color="black" aria-pressed="false" aria-label="Black" title="Black" style="--c:#2a2a2f"></button>
+      </div>
+    </div>
     <div class="hinge" id="hinge" hidden>
       <button id="swing">Close</button>
       <input id="angle" type="range" min="0" max="112" step="0.5" aria-label="Lid angle">
@@ -156,7 +172,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
 
   <section aria-labelledby="files">
     <h2 id="files">Files</h2>
-    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; tick <em>Supports</em> under the viewer to see where they go. The slate needs none. In both the phone drops into a pocket and MagSafe holds it: stick a steel MagSafe ring sticker into the round recess in the pocket's floor.</p>
+    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; the slate needs none. In both the phone drops into a pocket and MagSafe holds it: stick a steel MagSafe ring sticker into the round recess in the pocket's floor.</p>
     <div class="table">
       <table>
         <thead><tr><th>File</th><th>What</th><th>Print</th></tr></thead>
@@ -173,20 +189,6 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
     <p class="note">Every measurement is a named parameter in Python scripts that build the models in FreeCAD. To fit another phone or keyboard, change the numbers and run them again: see <a href="https://github.com/cobanov/cyberdeck#customizing">Customizing</a>.</p>
   </section>
 
-  <section aria-labelledby="builds">
-    <h2 id="builds">Two builds</h2>
-    <p class="sub">The same phone and keyboard, hinged or flat.</p>
-    <div class="builds">
-      <figure>
-        <img src="/img/cyberdeck_render-red-960.jpg" width="960" height="640" loading="lazy" alt="A clamshell deck, open on a wooden table: an iPhone in the lid shows a terminal, a compact keyboard sits in the base.">
-        <figcaption>Clamshell: 138 × 81 × 24.5 mm closed, the lid opens to 112°.</figcaption>
-      </figure>
-      <figure>
-        <img src="/img/slate_hero-red-960.jpg" width="960" height="640" loading="lazy" alt="A flat one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
-        <figcaption>Slate: one flat piece, 138 × 141 × 13.4 mm.</figcaption>
-      </figure>
-    </div>
-  </section>
 </main>
 </div>
 
@@ -237,24 +239,20 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const M = '/models/';
 const box = document.getElementById('viewer'), status = document.getElementById('status'), dl = document.getElementById('download');
-const BLACK = 0x2a2a2f, GREY = 0xb8b8b8, GLASS = 0x0c0e12, SUPPORT = 0xe8a33d, CASE = 'case';   // CASE: the part the colour swatches paint
+const BLACK = 0x2a2a2f, GREY = 0xb8b8b8, GLASS = 0x0c0e12, CASE = 'case';   // CASE: the part the colour swatches paint
 const COLORS = { red: 0xa3162b, white: 0xdcdcd8, mint: 0x94deba, black: 0x2a2a2f };
-let colour = 'red';
+let colour = 'mint';
 const [dims, sdims] = await Promise.all(['render/dims.json', 'render/slate/dims.json'].map(f => fetch(M + f).then(r => r.json())));
 // Each view's parts; parts sharing a name share a tick box. hinged: turns with the lid; flip: a face-down slate mesh, shown
-// face up like the print file. Supports are the slicer's, cut away after printing.
-const SUPPORTS = 'Supports (cut away after printing)';
+// face up like the print file.
 const VIEWS = {
   clamshell: { parts: [{ name: 'Base', path: 'render/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY },
                        { name: 'Lid', path: 'render/lid.stl', color: CASE, hinged: true }, { name: 'Phone', path: 'render/phone.stl', color: GLASS, hinged: true }] },
-  base: { file: 'stl/base.stl', parts: [{ name: 'Base', path: 'stl/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY }] },
-  lid: { file: 'stl/lid.stl', parts: [{ name: 'Lid', path: 'stl/lid.stl', color: CASE }, { name: SUPPORTS, path: 'render/supports/lid.bin', color: SUPPORT }] },
   slate: { file: 'stl/slate.stl', parts: [{ name: 'Slate', path: 'render/slate/slate.stl', color: CASE, flip: true },
                                           { name: 'Keyboard', path: 'render/slate/kb_body.stl', color: GREY },
                                           { name: 'Phone', path: 'render/slate/phone.stl', color: GLASS, flip: true }] },
-  gauge: { file: 'stl/radius_gauge.stl', parts: [{ name: 'Gauge', path: 'stl/radius_gauge.stl', color: CASE }] },
 };
-const hidden = new Set([SUPPORTS]);   // ticks carry across views
+const hidden = new Set(['Keyboard', 'Phone']);   // the shell alone at first, so its pockets show; ticks carry across views
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -270,25 +268,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
 const loader = new STLLoader(), cache = {};
-const geometry = path => cache[path] ??= path.endsWith('.bin') ? fetch(M + path).then(r => r.arrayBuffer()).then(lines) : loader.loadAsync(M + path);
-// render/supports.py's int16 lines (x0 y0 x1 y1 z h, 0.01 mm) as 0.4 mm wide extrusions: top, bottom and both sides.
-function lines(buf) {
-  const a = new Int16Array(buf), pos = [], w = 0.2;
-  for (let i = 0; i < a.length; i += 6) {
-    const [x0, y0, x1, y1, z, h] = Array.from(a.subarray(i, i + 6), v => v / 100), l = Math.hypot(x1 - x0, y1 - y0);
-    if (!l) continue;
-    const nx = -(y1 - y0) / l * w, ny = (x1 - x0) / l * w, zb = z - h;
-    const c = [[x0 + nx, y0 + ny], [x1 + nx, y1 + ny], [x1 - nx, y1 - ny], [x0 - nx, y0 - ny]];
-    const quad = (p, q, r, s) => pos.push(...p, ...q, ...r, ...p, ...r, ...s);
-    quad([...c[0], z], [...c[3], z], [...c[2], z], [...c[1], z]);       // top
-    quad([...c[0], zb], [...c[1], zb], [...c[2], zb], [...c[3], zb]);   // bottom
-    quad([...c[0], zb], [...c[0], z], [...c[1], z], [...c[1], zb]);     // sides
-    quad([...c[2], zb], [...c[2], z], [...c[3], z], [...c[3], zb]);
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  return g;
-}
+const geometry = path => cache[path] ??= loader.loadAsync(M + path);
 let group, shown, pivot, angle, target = null, last = 0;
 const partsBox = document.getElementById('parts');
 const hinge = document.getElementById('hinge'), swing = document.getElementById('swing'), slider = document.getElementById('angle'), deg = document.getElementById('deg');
@@ -336,8 +316,8 @@ async function show(name) {
     label.append(box, n);
     return label;
   }));
-  group.updateMatrixWorld(true);   // frame the parts themselves; the supports reach out past them
-  const b = new THREE.Box3(); meshes.forEach(m => m.userData.part !== SUPPORTS && b.expandByObject(m));
+  group.updateMatrixWorld(true);   // frame every part, shown or not, so ticking one doesn't move the view
+  const b = new THREE.Box3(); meshes.forEach(m => b.expandByObject(m));
   const c = b.getCenter(new THREE.Vector3()), size = b.getSize(new THREE.Vector3()).length();
   controls.target.copy(c);
   camera.position.copy(c).add(new THREE.Vector3(0.75, -1.3, 0.9).normalize().multiplyScalar(size * 1.6 / Math.min(1, camera.aspect)));
@@ -365,8 +345,8 @@ renderer.setAnimationLoop(t => {
 swing.addEventListener('click', () => { target = angle > dims.OPEN / 2 ? 0 : dims.OPEN; });
 slider.addEventListener('input', () => { target = null; setAngle(+slider.value); });
 
-document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x === b));
+document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.modes button').forEach(x => x.setAttribute('aria-pressed', x === b));
   show(b.dataset.view);
 }));
 document.querySelectorAll('.colors button').forEach(b => b.addEventListener('click', () => {
