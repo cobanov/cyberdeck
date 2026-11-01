@@ -3,6 +3,8 @@
 # Live Blender:  exec(open("/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck/render/scene.py").read(), {})
 # Render:        Blender -b -P scene.py -- --render [--preview] [--slate] [shot ...]   (default: every shot in SHOTS)
 #                --slate renders the one-piece handheld from slate/ instead of the clamshell.
+#                --color=white|mint|black prints the lid or slate in that PLA (default red) into colors/;
+#                the clamshell base stays charcoal.
 import bpy, bmesh, json, math, os, sys
 from mathutils import Matrix, Vector
 
@@ -13,6 +15,7 @@ MODEL = "slate" if "--slate" in ARGS else "cyberdeck"
 MD = os.path.join(DIR, "slate") if MODEL == "slate" else DIR   # meshes + dims.json; the slate is built face down
 C = json.load(open(os.path.join(MD, "dims.json")))
 PREVIEW = "--preview" in ARGS
+COLOR = next((a.split("=", 1)[1] for a in ARGS if a.startswith("--color=")), "red")
 # An aspect like 9:16 renders portrait frames into aspect/: same horizontal view as the 3:2 shots, zoomed in a little,
 # so the taller frame adds room and desk instead of cropping the deck.
 ASPECT = next((tuple(map(int, a.split(":"))) for a in ARGS if ":" in a), None)
@@ -132,15 +135,14 @@ def rounded_box(name, w, d, h, r, segments=3):
     return me
 
 
-def rounded_rect(name, w, d, r):
-    bm = bmesh.new()
-    bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=0.5)
-    for v in bm.verts:
-        v.co = Vector((v.co.x * w, v.co.y * d, 0)) * S       # grid size=0.5 spans +-0.5
-    bmesh.ops.bevel(bm, geom=list(bm.verts), offset=r * S, segments=8, affect="VERTICES")
+def rounded_rect(name, w, d, r, n=12):
+    # Drawn as arcs: a vertex bevel cut the corners at 45 deg, and the phone's face showed through the triangles.
+    pts = []
+    for cx, cy, a0 in [(w / 2 - r, d / 2 - r, 0), (r - w / 2, d / 2 - r, 90), (r - w / 2, r - d / 2, 180), (w / 2 - r, r - d / 2, 270)]:
+        pts += [Vector((cx + r * math.cos(math.radians(a0 + 90 * i / n)), cy + r * math.sin(math.radians(a0 + 90 * i / n)), 0)) * S
+                for i in range(n + 1)]
     me = bpy.data.meshes.new(name)
-    bm.to_mesh(me)
-    bm.free()
+    me.from_pydata(pts, [], [list(range(len(pts)))])
     return me
 
 
@@ -156,17 +158,18 @@ def text(body, size, loc, mat, rot=(0, 0, 0), align="CENTER"):
 # --- materials ---
 pla = material("PLA charcoal", (0.035, 0.036, 0.04), rough=0.55)
 bump(pla, layer_lines, 0.18, 0.00003)
-ruby = material("PLA ruby red", (0.40, 0.008, 0.02), rough=0.32)
-bump(ruby, layer_lines, 0.18, 0.00003)
+CASE = {"red": ((0.40, 0.008, 0.02), 0.32), "white": ((0.86, 0.86, 0.84), 0.4),
+        "mint": ((0.30, 0.72, 0.50), 0.4), "black": ((0.035, 0.036, 0.04), 0.55)}
+case_pla = material("PLA " + COLOR, *CASE[COLOR])
+bump(case_pla, layer_lines, 0.18, 0.00003)
 kb_plastic = material("Keyboard body", (0.02, 0.02, 0.022), rough=0.75)
 key_rim = material("Key rim", (0.55, 0.56, 0.58), rough=0.5)
 key_top = material("Key top", (0.012, 0.012, 0.014), rough=0.8)
 legend = material("Legend", (0.85, 0.86, 0.88), rough=0.6)
 phone_body = material("iPhone black", (0.015, 0.016, 0.02), rough=0.25, metal=0.6)
 steel = material("Black oxide", (0.05, 0.05, 0.055), rough=0.35, metal=1.0)
-screen = material("Screen", (0.0, 0.0, 0.0), rough=0.03, emit=(0.012, 0.016, 0.024), strength=1.0)
+screen = material("Screen", (0.0, 0.0, 0.0), rough=0.03)   # OLED showing a black terminal: as black as its border
 next(n for n in screen.node_tree.nodes if n.type == "BSDF_PRINCIPLED").inputs["Specular IOR Level"].default_value = 0.2   # AR-coated glass
-notch = material("Notch", (0.0, 0.0, 0.0), rough=0.45)
 TERM = {k: material("Term " + k, (0, 0, 0), rough=1.0, emit=c, strength=4.0) for k, c in {
     "green": (0.25, 1.0, 0.45), "white": (0.85, 0.88, 0.92), "gray": (0.45, 0.5, 0.56), "orange": (1.0, 0.45, 0.15)}.items()}
 
@@ -206,7 +209,7 @@ before = set(bpy.data.objects)
 stl("kb_body", kb_plastic, bevel=0.6)
 KX, KY, KZ = C["WALL"] + C["KB_CLR"], C["WALL"] + C["KB_CLR"], C["FLOOR"] + C["KB_BODY"]
 CAP_H = C["KB_KEYS"] - C["KB_BODY"]
-MARGIN = 3.0
+MARGIN = 5.0   # border round the key field (user: the keys sit further in than 3 mm and are a touch smaller)
 PX_, PY_ = (C["KB_W"] - 2 * MARGIN) / 13, (C["KB_D"] - 2 * MARGIN) / 6
 ROWS = [
     [("Esc", 1)] + [(f"F{i}", 1) for i in range(1, 13)],
@@ -245,17 +248,36 @@ hinge = bpy.data.objects.new("Hinge", None)
 col.objects.link(hinge)
 hinge.location = mm(0, C["YA"], C["ZA"])
 bpy.context.view_layer.update()
-lid_parts = [stl("lid" if MODEL == "cyberdeck" else "slate", ruby, bevel=0.35), stl("phone", phone_body, bevel=0.0)]
+lid_parts = [stl("lid" if MODEL == "cyberdeck" else "slate", case_pla, bevel=0.35), stl("phone", phone_body, bevel=0.0)]
 
 SW, SD = 124.9, 57.6                                 # iPhone 12 mini active area
 pcx, pcy = C["PHONE_X"] + C["PH_W"] / 2, C["PHONE_Y"] + C["PH_D"] / 2
 sz = C["HB"] + C["LIP_T"] - 0.03                     # screen faces -Z while closed
 FLIP = (math.pi, 0, 0)
-scr = link(bpy.data.objects.new("Screen", rounded_rect("screen", SW, SD, 6.0)), screen)
+# One glass sheet over the whole face, so the active area, its border and the notch read as one black front.
+scr = link(bpy.data.objects.new("Screen", rounded_rect("screen", C["PH_W"] - 0.4, C["PH_D"] - 0.4, 9.8)), screen)
 scr.location, scr.rotation_euler = mm(pcx, pcy, sz), FLIP
-nt = link(bpy.data.objects.new("Notch", rounded_box("notch", 5.6, 34.8, 0.1, 0.04, 2)), notch)
-nt.location = mm(pcx - SW / 2 + 2.8, pcy, sz - 0.06)
-lid_parts += [scr, nt]
+lid_parts.append(scr)
+
+# Rear camera, seen through the plate's window: a 26 mm glass square 4 mm in from the camera end and the side-key
+# edge, the two lenses in a row along that edge, the flash beside the first.
+zb = sz + 0.03 + C["PH_T"]
+bx, by = C["PHONE_X"] + 4, C["PHONE_Y"] + 4
+cam_glass = material("Camera glass", (0.01, 0.01, 0.012), rough=0.08)
+lens_ring = material("Lens ring", (0.25, 0.25, 0.27), rough=0.25, metal=1.0)
+lens = material("Lens", (0.0, 0.0, 0.005), rough=0.02)
+flash = material("Flash", (0.75, 0.7, 0.55), rough=0.5)
+sq = link(bpy.data.objects.new("CameraGlass", rounded_rect("camglass", 26, 26, 7)), cam_glass)
+sq.location = mm(bx + 13, by + 13, zb + 0.02)
+lid_parts.append(sq)
+for x, y, r, h, m in [(6.5, 6.5, 5.0, 1.2, lens_ring), (19.5, 6.5, 5.0, 1.2, lens_ring), (6.5, 6.5, 3.6, 1.3, lens),
+                      (19.5, 6.5, 3.6, 1.3, lens), (6.5, 19.5, 2.0, 0.3, flash)]:
+    bpy.ops.mesh.primitive_cylinder_add(radius=r * S, depth=h * S, vertices=48, location=mm(bx + x, by + y, zb + h / 2))
+    o = bpy.context.view_layer.objects.active
+    o.data.materials.append(m)
+    o.data.shade_smooth()
+    o.data.set_sharp_from_angle(angle=math.radians(30))   # flat caps, round sides
+    lid_parts.append(o)
 
 LINES = [
     [("cobanov@cyberdeck ~ % ", "green"), ("ssh nuc", "white")],
@@ -355,8 +377,11 @@ if bpy.app.background and "--render" in ARGS:
     for name in [a for a in ARGS if a in SHOTS] or list(SHOTS):
         shot(name)
         out = "cyberdeck_render.png" if (MODEL, name) == ("cyberdeck", "hero") else f"{MODEL}_{name}.png"
+        if COLOR != "red":
+            out = os.path.join("colors", out.replace(".png", f"_{COLOR}.png"))
         if ASPECT:
             out = os.path.join("aspect", out.replace(".png", f"_{aw}x{ah}.png"))
-        scene.render.filepath = os.path.join(DIR, ("preview_" + out) if PREVIEW else out)
+        d, f = os.path.split(out)
+        scene.render.filepath = os.path.join(DIR, d, ("preview_" + f) if PREVIEW else f)
         bpy.ops.render.render(write_still=True)
 print("scene ready:", len(bpy.data.objects), "objects")

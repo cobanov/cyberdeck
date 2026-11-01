@@ -102,9 +102,11 @@ its own repo.
 
 `render/scene.py` builds the scene in Blender 5.2 (Cycles): the deck on an oak desk lit by the `artist_workshop`
 HDRI, with a lit terminal on the phone. It renders every shot in its `SHOTS` table unless shots are named.
+`--color=white`, `mint` or `black` prints the lid or slate in that colour into `render/colors/` (the default is red;
+the clamshell base stays charcoal).
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender -b -P render/scene.py -- --render [--preview] [--slate] [shot ...]
+/Applications/Blender.app/Contents/MacOS/Blender -b -P render/scene.py -- --render [--preview] [--slate] [--color=mint] [shot ...]
 ```
 
 Assets in `render/assets/` are CC0 from Poly Haven.
@@ -112,7 +114,7 @@ Assets in `render/assets/` are CC0 from Poly Haven.
 ## Website
 
 `site/` is [cyberdeck.cobanov.dev](https://cyberdeck.cobanov.dev): static files on Cloudflare and a three.js viewer
-that opens and closes the clamshell. `site/deploy.sh` publishes it with the STLs from the last commit, so the
+that opens and closes the clamshell, in any of the four colours. `site/deploy.sh` publishes it with the STLs from the last commit, so the
 downloads never carry a change still being tried.
 
 ## Status

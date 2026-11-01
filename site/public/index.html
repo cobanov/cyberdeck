@@ -10,7 +10,7 @@
 <meta property="og:title" content="Cyberdeck: a pocket deck you can print">
 <meta property="og:description" content="An iPhone and a mini keyboard in a 3D-printed clamshell or slate. Free STL files.">
 <meta property="og:url" content="https://cyberdeck.cobanov.dev/">
-<meta property="og:image" content="https://cyberdeck.cobanov.dev/img/cyberdeck_render-960.jpg">
+<meta property="og:image" content="https://cyberdeck.cobanov.dev/img/cyberdeck_render-red-960.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="/fonts/JetBrainsMono-Bold.ttf" as="font" type="font/ttf" crossorigin>
@@ -52,7 +52,11 @@ section { margin-bottom: 72px; }
 .sub { color: var(--muted); margin: 0 0 24px; font-size: 1.0625rem; }
 .note { color: var(--muted); font-size: 0.875rem; margin: 12px 0 0; }
 .note a, .sub a { color: var(--accent); }
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 16px; margin-bottom: 12px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.colors { display: flex; gap: 10px; }
+.colors button { width: 26px; height: 26px; padding: 0; border-radius: 50%; background: var(--c); border: 1px solid var(--muted); cursor: pointer; }
+.colors button[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 3px; }
 .tabs button, .hinge button { font: 600 0.875rem var(--sans); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer; }
 .tabs button:hover, .hinge button:hover { border-color: var(--muted); }
 .tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #000; }
@@ -119,12 +123,20 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
   <section aria-labelledby="models">
     <h2 id="models">Models</h2>
     <p class="sub">Drag to turn, scroll or pinch to zoom, right-drag or two fingers to move.</p>
-    <div class="tabs" role="group" aria-label="Model">
-      <button data-view="clamshell" aria-pressed="true">Clamshell, assembled</button>
-      <button data-view="base">Base</button>
-      <button data-view="lid">Lid</button>
-      <button data-view="slate">Slate</button>
-      <button data-view="gauge">Radius gauge</button>
+    <div class="bar">
+      <div class="tabs" role="group" aria-label="Model">
+        <button data-view="clamshell" aria-pressed="true">Clamshell, assembled</button>
+        <button data-view="base">Base</button>
+        <button data-view="lid">Lid</button>
+        <button data-view="slate">Slate</button>
+        <button data-view="gauge">Radius gauge</button>
+      </div>
+      <div class="colors" role="group" aria-label="Colour">
+        <button data-color="red" aria-pressed="true" aria-label="Red" title="Red" style="--c:#a3162b"></button>
+        <button data-color="white" aria-label="White" title="White" style="--c:#e4e4e0"></button>
+        <button data-color="mint" aria-label="Mint" title="Mint" style="--c:#94deba"></button>
+        <button data-color="black" aria-label="Black" title="Black" style="--c:#2a2a2f"></button>
+      </div>
     </div>
     <div class="viewer" id="viewer">
       <div class="status"><span id="status">Loading…</span><span id="download"></span></div>
@@ -161,11 +173,11 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
     <p class="sub">The same phone and keyboard, hinged or flat.</p>
     <div class="builds">
       <figure>
-        <img src="/img/cyberdeck_render-960.jpg" width="960" height="640" loading="lazy" alt="A red and black clamshell deck, open on a wooden table: an iPhone in the lid shows a terminal, a compact keyboard sits in the base.">
+        <img src="/img/cyberdeck_render-red-960.jpg" width="960" height="640" loading="lazy" alt="A clamshell deck, open on a wooden table: an iPhone in the lid shows a terminal, a compact keyboard sits in the base.">
         <figcaption>Clamshell: 138 × 81 × 24.5 mm closed, the lid opens to 112°.</figcaption>
       </figure>
       <figure>
-        <img src="/img/slate_hero-960.jpg" width="960" height="640" loading="lazy" alt="A flat red one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
+        <img src="/img/slate_hero-red-960.jpg" width="960" height="640" loading="lazy" alt="A flat one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
         <figcaption>Slate: one flat piece, 138 × 140 × 11.6 mm.</figcaption>
       </figure>
     </div>
@@ -220,14 +232,16 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const M = '/models/';
 const box = document.getElementById('viewer'), status = document.getElementById('status'), dl = document.getElementById('download');
-const BLACK = 0x2a2a2f, RED = 0xa3162b, GREY = 0xb8b8b8, GLASS = 0x0c0e12;
+const BLACK = 0x2a2a2f, GREY = 0xb8b8b8, GLASS = 0x0c0e12, CASE = 'case';   // CASE: the part the colour swatches paint
+const COLORS = { red: 0xa3162b, white: 0xdcdcd8, mint: 0x94deba, black: 0x2a2a2f };
+let colour = 'red';
 const dims = await fetch(M + 'render/dims.json').then(r => r.json());
 const VIEWS = {
-  clamshell: [['render/base.stl', BLACK], ['render/kb_body.stl', GREY], ['render/lid.stl', RED, true], ['render/phone.stl', GLASS, true]],
+  clamshell: [['render/base.stl', BLACK], ['render/kb_body.stl', GREY], ['render/lid.stl', CASE, true], ['render/phone.stl', GLASS, true]],
   base: [['stl/base.stl', BLACK]],
-  lid: [['stl/lid.stl', RED]],
-  slate: [['stl/slate.stl', RED]],
-  gauge: [['stl/radius_gauge.stl', RED]],
+  lid: [['stl/lid.stl', CASE]],
+  slate: [['stl/slate.stl', CASE]],
+  gauge: [['stl/radius_gauge.stl', CASE]],
 };
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -264,7 +278,8 @@ async function show(name) {
       // The render meshes are modelled closed; the lid and phone turn about the hinge axis (x, through YA, ZA).
       if (hinged) g.translate(0, -dims.YA, -dims.ZA);
       g.computeVertexNormals();
-      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color, roughness: 0.55 }));
+      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: color === CASE ? COLORS[colour] : color, roughness: 0.55 }));
+      m.userData.case = color === CASE;
       m.userData.hinged = hinged;
       return m;
     }));
@@ -307,6 +322,12 @@ slider.addEventListener('input', () => { target = null; setAngle(+slider.value);
 document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x === b));
   show(b.dataset.view);
+}));
+document.querySelectorAll('.colors button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.colors button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  colour = b.dataset.color;
+  group?.traverse(m => m.userData.case && m.material.color.setHex(COLORS[colour]));
+  document.querySelectorAll('.builds img').forEach(i => { i.src = i.src.replace(/-(red|white|mint|black)-960/, `-${colour}-960`); });
 }));
 show('clamshell');
 </script>
