@@ -29,7 +29,7 @@ LAYER = 0.2              # print layer height: the phone pocket's heights sit on
 RING_D = 58.0            # ring recess diameter: common stickers are 56 mm across; measure yours
 MAG_DX, MAG_DY = 0.0, 0.0   # ring centre from the phone's centre (the Apple logo); stick the ring on the phone, where its
                             # magnets centre it, and measure if it sits off-centre
-CHAMFER = 0.6            # every convex square edge the pocket leaves: rims, slots, windows
+CHAMFER = 0.6            # every convex square edge: rims, slots, windows
 CHAMFER_THIN = 0.3       # where there's no room for CHAMFER: the ring recess, the volume-button groove, the camera
                          # window's rim (0.6 mm from the pocket's corner), and the Lightning slot's sloped ends
 
@@ -133,10 +133,11 @@ def pocket_thin(p, zf):
     return ring or groove or camera or lightning
 
 
-def chamfer_sharp(s, thin):
-    """Chamfer every convex square edge of s: CHAMFER, or CHAMFER_THIN where thin(point) says there's no room."""
+def chamfer_sharp(s, thin, skip=lambda p: False):
+    """Chamfer every convex square edge of s: CHAMFER, or CHAMFER_THIN where thin(point) says there's no room. Edges
+    where skip(point) holds stay square."""
     for r, t in ((CHAMFER, False), (CHAMFER_THIN, True)):
-        es = [e for e in s.Edges if thin(mid(e)) == t and sharp(s, e)]
+        es = [e for e in s.Edges if not skip(mid(e)) and thin(mid(e)) == t and sharp(s, e)]
         if es:
             s = s.makeChamfer(r, es).removeSplitter()
     return s

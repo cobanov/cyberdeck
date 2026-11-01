@@ -78,14 +78,13 @@ def make_base():
         else:
             clr, tap, head = (bi[1], W + 1), bi, (W - 3.5, W + 1)
         s = s.cut(xcyl(M3_CLR / 2, *clr)).cut(xcyl(M3_TAP / 2, *tap)).cut(xcyl(M3_HEAD / 2, *head))
-    return s.removeSplitter()
+    return chamfer_sharp(s.removeSplitter(), hinge_thin, base_skip)
 
 
 def make_lid():
     s = rbox(W, D, HL, R_OUT, 0, 0, HB)
     s = s.makeFillet(EDGE_R, [e for e in s.Edges if e.BoundBox.ZLength < 1e-6])
     s = phone_pocket(s, HB, HB + HL, SINK)
-    s = chamfer_sharp(s.removeSplitter(), lambda p: pocket_thin(p, HB + SINK + PH_T))
     # Web behind the OPEN ray: lands flat on the base behind the axis at the stop, all the way between the hinges.
     tip = V(0, YA, ZA) + RAY * TIP
     web = Part.Face(Part.makePolygon([V(0, D - 3, ZA), V(0, YA - TIP, ZA), V(0, tip.y, tip.z), V(0, D, ZA + HL),
@@ -96,7 +95,17 @@ def make_lid():
     for left in (True, False):
         li = hinge_spans(left)[1]
         s = s.fuse(xcyl(HR, *li)).cut(xcyl(M3_PIN / 2, li[0] - 1, li[1] + 1))
-    return s.removeSplitter()
+    return chamfer_sharp(s.removeSplitter(), lambda p: hinge_thin(p) or pocket_thin(p, HB + SINK + PH_T), lid_skip)
+
+
+# Chamfers: the hinge's small features take CHAMFER_THIN. Square on purpose: the strips where the lid's web lands on the
+# base at the stop (0.1 mm off there tilts the open lid ~2 deg). Square because even CHAMFER_THIN fails there: on the
+# base's back face the groove run-outs and the M3 bores' ends, and the web's ends where they meet the lid's faces. They
+# stand upright or lie on the bed in print, so none overhangs.
+hinge_thin = lambda p: p.y > D - 3.5
+base_skip = lambda p: (p.y > YA - 0.1 and abs(p.z - HB) < 0.1) or abs(p.y - Y_END) < 0.3 or math.hypot(p.y - YA, p.z - ZA) < 2
+lid_skip = lambda p: ((abs((p.y - YA) * RAY.z - (p.z - ZA) * RAY.y) < 0.05 and p.y < YA)
+                      or (p.y > D - 3.5 and min(abs(p.z - HB), abs(p.z - HB - HL)) < 0.1))
 
 
 def opened(shape, deg):
