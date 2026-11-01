@@ -28,7 +28,7 @@ SHOTS = {
     "profile": (182, 6, 0.50, (69, 60, 35), 70, 11, None),
     "back":    (62, 24, 0.40, (69, 82, 22), 60, 8, None),
     "closed":  (232, 32, 0.44, (69, 45, 14), 60, 11, 0),
-    "slot":    (200, 16, 0.26, (0, 96, 50), 85, 5.6, None),   # phone slot at the open lid's left end
+    "slot":    (200, 16, 0.26, (0, 96, 50), 85, 5.6, None),   # the open lid's left end: camera window, pocket rim
 } if MODEL == "cyberdeck" else {
     "hero":    (244, 34, 0.40, (69, 73, 7), 60, 11, None),
     "top":     (270, 72, 0.52, (69, 73, 8), 60, 11, None),
@@ -252,7 +252,7 @@ lid_parts = [stl("lid" if MODEL == "cyberdeck" else "slate", case_pla, bevel=0.3
 
 SW, SD = 124.9, 57.6                                 # iPhone 12 mini active area
 pcx, pcy = C["PHONE_X"] + C["PH_W"] / 2, C["PHONE_Y"] + C["PH_D"] / 2
-sz = C["HB"] + C["LIP_T"] - 0.03                     # screen faces -Z while closed
+sz = C["HB"] + C["SINK"] - 0.03                     # screen faces -Z while closed
 FLIP = (math.pi, 0, 0)
 # One glass sheet over the whole face, so the active area, its border and the notch read as one black front.
 scr = link(bpy.data.objects.new("Screen", rounded_rect("screen", C["PH_W"] - 0.4, C["PH_D"] - 0.4, 9.8)), screen)

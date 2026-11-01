@@ -7,7 +7,13 @@ from FreeCAD import Vector as V
 
 DIR = "/Volumes/cobanov-ssd/Workspace/3d-projects/cyberdeck"
 
-exec(open(os.path.join(DIR, "deck.py")).read(), globals())   # measured parts, fits, phone bay
+exec(open(os.path.join(DIR, "deck.py")).read(), globals())   # measured parts, fits, the MagSafe phone pocket
+
+# The phone drops into the lid's pocket screen first. Its screen sits SINK below the lid's face, so with the lid closed
+# it stays SINK + KEY_GAP (1.5 mm) clear of the key tops, as the frame lip it replaced held it.
+SINK = 1.2
+HL = SINK + PH_T + RING + PLATE                     # lid thickness
+assert all(abs(h / LAYER - round(h / LAYER)) < 1e-6 for h in (SINK, SINK + PH_T, HL)), "lid's heights off layer lines"
 
 # --- hinge: 2x (base | lid | base) knuckles, M3x20 socket screw self-tapped into the inner base knuckle ---
 HR, HG, KG = 4.0, 0.5, 0.4      # knuckle radius, radial gap, axial gap
@@ -78,7 +84,8 @@ def make_base():
 def make_lid():
     s = rbox(W, D, HL, R_OUT, 0, 0, HB)
     s = s.makeFillet(EDGE_R, [e for e in s.Edges if e.BoundBox.ZLength < 1e-6])
-    s = phone_bay(s, HB, HB + HL)
+    s = phone_pocket(s, HB, HB + HL, SINK)
+    s = chamfer_sharp(s.removeSplitter(), lambda p: pocket_thin(p, HB + SINK + PH_T))
     # Web behind the OPEN ray: lands flat on the base behind the axis at the stop, all the way between the hinges.
     tip = V(0, YA, ZA) + RAY * TIP
     web = Part.Face(Part.makePolygon([V(0, D - 3, ZA), V(0, YA - TIP, ZA), V(0, tip.y, tip.z), V(0, D, ZA + HL),
@@ -100,13 +107,14 @@ def opened(shape, deg):
 
 base, lid = make_base(), make_lid()
 kb = keyboard(WALL + KB_CLR, WALL + KB_CLR, FLOOR)
-phone = check_phone(lid, HB)
+phone = check_pocket(lid, HB, SINK)
 
 # Self-check: lid swings freely up to the stop, the stop engages, parts fit their pockets.
 for deg in (0, 45, 90, OPEN - 0.5):
     assert opened(lid, deg).common(base).Volume < 0.01, f"lid hits base at {deg:.1f} deg"
 assert opened(lid, OPEN + 3).common(base).Volume > 0.01, "stop does not engage"
 assert kb.common(base).Volume < 0.01, "keyboard pocket too small"
+assert phone.common(kb).Volume < 0.01, "closed, the screen hits the keys"
 # The web lands flat on the base at the stop. The lid's weight sits behind the axis there, so gravity holds it open.
 assert (App.Rotation(V(1, 0, 0), -OPEN).multVec(RAY) - V(0, 1, 0)).Length < 1e-6, "web not flat on the base"
 assert all(opened(x, OPEN).Solids[0].CenterOfMass.y > YA for x in (lid, phone)), "lid falls forward off its stop"
@@ -136,9 +144,8 @@ lid_p = lid.copy()
 lid_p.rotate(V(0, 0, 0), V(1, 0, 0), 180)
 lid_p.translate(V(0, -lid_p.BoundBox.YMin, -lid_p.BoundBox.ZMin))
 fit_kb = rbox(W, D, 3, R_OUT).cut(rbox(PW, PD, 5, CORNER_R + KB_CLR, WALL, WALL, -1))
-fit_ph = lid_p.common(Part.makeBox(35, D + 1, HL + 1, V(-1, -1, -1)))   # left end: rails, lips and latch
 os.makedirs(os.path.join(DIR, "stl"), exist_ok=True)
-for name, shape in [("base", base), ("lid", lid_p), ("fit_keyboard", fit_kb), ("fit_phone", fit_ph)]:
+for name, shape in [("base", base), ("lid", lid_p), ("fit_keyboard", fit_kb)]:
     MeshPart.meshFromShape(Shape=shape, LinearDeflection=0.05, AngularDeflection=0.2).write(
         os.path.join(DIR, "stl", name + ".stl"))
 
@@ -148,7 +155,7 @@ for name, shape in [("base", base), ("lid", lid), ("kb_body", kb_body), ("phone"
     MeshPart.meshFromShape(Shape=shape, LinearDeflection=0.02, AngularDeflection=0.1).write(
         os.path.join(DIR, "render", name + ".stl"))
 dims = {k: globals()[k] for k in ("W", "D", "HB", "HL", "YA", "ZA", "OPEN", "KB_W", "KB_D", "KB_BODY", "KB_KEYS",
-                                  "WALL", "KB_CLR", "FLOOR", "PH_W", "PH_D", "PH_T", "LIP_T", "PX", "PPW")}
+                                  "WALL", "KB_CLR", "FLOOR", "PH_W", "PH_D", "PH_T", "SINK", "PX", "PPW")}
 dims.update(PHONE_X=PHONE_X, PHONE_Y=PHONE_Y)
 json.dump(dims, open(os.path.join(DIR, "render", "dims.json"), "w"), indent=1)
 

@@ -1,11 +1,10 @@
 #!/bin/bash
-# Slice the printable parts (clamshell, slate, fit tests, radius gauge and its case) for a Creality K1 with generic PLA into gcode/k1-pla/.
+# Slice the printable parts (clamshell, slate, keyboard fit test, radius gauge and its case) for a Creality K1 with generic PLA into gcode/k1-pla/.
 # Profiles (inherits resolved, so the CLI can't fill gaps with its own defaults): profiles/k1_pla_filament.json
 # (the PLA @K1 cobanov preset, copied from the vault's 3d-print/profiles/cli/pla_k1_cobanov.json),
 # profiles/k1_base_process.json (no supports), profiles/k1_lid_process.json (tree supports under the hinge knuckles),
-# profiles/k1_slate_process.json (tree supports from the bed only, for the frame over the phone bay's open end: slate.stl's
-# one-layer skins over the screen and camera windows carry the frame lips and keep supports out of the bay; the topmost
-# surface, the screen face, ironed).
+# profiles/k1_slate_process.json (no supports: every pocket and slot in the slate opens to the face or through the back;
+# the topmost surface, the screen face, ironed).
 # Each G-code then gets the side fan switched on for its bridges only.
 H=$(cd "$(dirname "$0")" && pwd)
 P=/Applications/OrcaSlicer.app/Contents/Resources/profiles/Creality
@@ -20,8 +19,8 @@ sl() {
   [ -f "$t/plate_2.gcode" ] && { echo "$out: parts don't fit one plate"; exit 1; }
   if [ -f "$t/plate_1.gcode" ]; then
     f="$H/gcode/k1-pla/$out"; mv "$t/plate_1.gcode" "$f"
-    # Side fan (P2) only while bridging: on the part fan alone the frame lips' 60-120 mm bridges sag onto the screen,
-    # but the preset keeps the side fan off because it blows on the bed. All bridges here are 7 mm or more up.
+    # Side fan (P2) only while bridging: the old frame lips' 60-120 mm bridges sagged on the part fan alone, but the
+    # preset keeps the side fan off because it blows on the bed. Any bridge left is well above the bed.
     python3 - "$f" <<'EOF'
 import sys
 p = sys.argv[1]; out = []; on = False
@@ -45,11 +44,9 @@ EOF
 }
 sl base_PLA.gcode base "$H/stl/base.stl"
 sl lid_PLA.gcode lid "$H/stl/lid.stl"
-# The clamshell's two fit tests on one plate (supports only under fit_phone's hinge knuckle).
-sl fit-tests_PLA.gcode lid "$H/stl/fit_keyboard.stl" "$H/stl/fit_phone.stl"
+sl fit-keyboard_PLA.gcode base "$H/stl/fit_keyboard.stl"
 sl radius-gauge_PLA.gcode base "$H/stl/radius_gauge.stl"
 sl radius-gauge-case_PLA.gcode base "$H/stl/radius_gauge_case.stl" "$H/stl/radius_gauge_lid.stl"
 sl slate_PLA.gcode slate "$H/stl/slate.stl"
 # The site viewer's supports, read back out of the G-code just written.
 python3 "$H/render/supports.py" "$H/gcode/k1-pla/lid_PLA.gcode" "$H/stl/lid.stl" "$H/render/supports/lid.bin"
-python3 "$H/render/supports.py" "$H/gcode/k1-pla/slate_PLA.gcode" "$H/stl/slate.stl" "$H/render/supports/slate.bin"

@@ -156,15 +156,15 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
 
   <section aria-labelledby="files">
     <h2 id="files">Files</h2>
-    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; the slate needs them only outside its open end and side windows. Cut the slate's thin skins out of its screen and camera windows after printing. Tick <em>Supports</em> under the viewer to see where they go.</p>
+    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; tick <em>Supports</em> under the viewer to see where they go. The slate needs none. In both the phone drops into a pocket and MagSafe holds it: stick a steel MagSafe ring sticker into the round recess in the pocket's floor.</p>
     <div class="table">
       <table>
         <thead><tr><th>File</th><th>What</th><th>Print</th></tr></thead>
         <tbody>
           <tr><td><a href="/models/stl/base.stl" download>base.stl</a></td><td>Clamshell: keyboard tray and hinge</td><td>Floor down, no supports</td></tr>
-          <tr><td><a href="/models/stl/lid.stl" download>lid.stl</a></td><td>Clamshell: slide-in phone bay and hinge knuckles</td><td>Back plate down, tree supports under the knuckles</td></tr>
-          <tr><td><a href="/models/stl/fit_keyboard.stl" download>fit_keyboard.stl</a><br><a href="/models/stl/fit_phone.stl" download>fit_phone.stl</a></td><td>Fit tests: a slice of the keyboard pocket, the left end of the clamshell's phone bay</td><td>Before the full parts, to try the fit</td></tr>
-          <tr><td><a href="/models/stl/slate.stl" download>slate.stl</a></td><td>Slate: phone on top, keyboard below, one piece</td><td>Back down, tree supports from the bed only; cut the 0.2 mm skins out of the screen and camera windows afterwards</td></tr>
+          <tr><td><a href="/models/stl/lid.stl" download>lid.stl</a></td><td>Clamshell: MagSafe phone pocket and hinge knuckles</td><td>Back plate down, tree supports under the knuckles</td></tr>
+          <tr><td><a href="/models/stl/fit_keyboard.stl" download>fit_keyboard.stl</a></td><td>Fit test: a slice of the keyboard pocket</td><td>Before the full parts, to try the fit</td></tr>
+          <tr><td><a href="/models/stl/slate.stl" download>slate.stl</a></td><td>Slate: phone on top, held by MagSafe; keyboard below; one piece</td><td>Back down, no supports</td></tr>
           <tr><td><a href="/models/stl/radius_gauge.stl" download>radius_gauge.stl</a></td><td>Corner radius gauge, 7–11.5 mm, for a different phone or keyboard</td><td>Flat</td></tr>
           <tr><td><a href="/models/stl/radius_gauge_case.stl" download>radius_gauge_case.stl</a><br><a href="/models/stl/radius_gauge_lid.stl" download>radius_gauge_lid.stl</a></td><td>Case and sliding lid for the gauge tiles</td><td>Upright and flat, no supports</td></tr>
         </tbody>
@@ -183,7 +183,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
       </figure>
       <figure>
         <img src="/img/slate_hero-red-960.jpg" width="960" height="640" loading="lazy" alt="A flat one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
-        <figcaption>Slate: one flat piece, 138 × 140 × 13.4 mm.</figcaption>
+        <figcaption>Slate: one flat piece, 138 × 141 × 13.4 mm.</figcaption>
       </figure>
     </div>
   </section>
@@ -242,7 +242,7 @@ const COLORS = { red: 0xa3162b, white: 0xdcdcd8, mint: 0x94deba, black: 0x2a2a2f
 let colour = 'red';
 const [dims, sdims] = await Promise.all(['render/dims.json', 'render/slate/dims.json'].map(f => fetch(M + f).then(r => r.json())));
 // Each view's parts; parts sharing a name share a tick box. hinged: turns with the lid; flip: a face-down slate mesh, shown
-// face up like the print file. Supports are the slicer's (and the slate's print skins), cut away after printing.
+// face up like the print file. Supports are the slicer's, cut away after printing.
 const SUPPORTS = 'Supports (cut away after printing)';
 const VIEWS = {
   clamshell: { parts: [{ name: 'Base', path: 'render/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY },
@@ -251,9 +251,7 @@ const VIEWS = {
   lid: { file: 'stl/lid.stl', parts: [{ name: 'Lid', path: 'stl/lid.stl', color: CASE }, { name: SUPPORTS, path: 'render/supports/lid.bin', color: SUPPORT }] },
   slate: { file: 'stl/slate.stl', parts: [{ name: 'Slate', path: 'render/slate/slate.stl', color: CASE, flip: true },
                                           { name: 'Keyboard', path: 'render/slate/kb_body.stl', color: GREY },
-                                          { name: 'Phone', path: 'render/slate/phone.stl', color: GLASS, flip: true },
-                                          { name: SUPPORTS, path: 'render/supports/slate.bin', color: SUPPORT },
-                                          { name: SUPPORTS, path: 'render/slate/skins.stl', color: SUPPORT, flip: true }] },
+                                          { name: 'Phone', path: 'render/slate/phone.stl', color: GLASS, flip: true }] },
   gauge: { file: 'stl/radius_gauge.stl', parts: [{ name: 'Gauge', path: 'stl/radius_gauge.stl', color: CASE }] },
 };
 const hidden = new Set([SUPPORTS]);   // ticks carry across views
