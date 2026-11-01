@@ -64,6 +64,10 @@ section { margin-bottom: 72px; }
 .viewer canvas { display: block; width: 100%; height: 100%; }
 .status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; color: var(--muted); font-size: 0.875rem; display: flex; justify-content: space-between; gap: 16px; pointer-events: none; }
 .status a { pointer-events: auto; color: var(--accent); }
+.parts { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; }
+.parts[hidden] { display: none; }
+.parts label { display: flex; align-items: center; gap: 8px; font-size: 0.9375rem; cursor: pointer; }
+.parts input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
 .hinge { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
 .hinge[hidden] { display: none; }
 .hinge input { flex: 1; min-width: 0; accent-color: var(--accent); }
@@ -142,6 +146,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
       <div class="status"><span id="status">Loading…</span><span id="download"></span></div>
       <noscript><p style="padding:1rem">The 3D view needs JavaScript. The STL files are listed below.</p></noscript>
     </div>
+    <div class="parts" id="parts" role="group" aria-label="Parts shown" hidden></div>
     <div class="hinge" id="hinge" hidden>
       <button id="swing">Close</button>
       <input id="angle" type="range" min="0" max="112" step="0.5" aria-label="Lid angle">
@@ -151,7 +156,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
 
   <section aria-labelledby="files">
     <h2 id="files">Files</h2>
-    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; the slate needs none, but cut the thin skin out of its screen window after printing.</p>
+    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; the slate needs them only outside its open end and side windows. Cut the slate's thin skins out of its screen and camera windows after printing. Tick <em>Supports</em> under the viewer to see where they go.</p>
     <div class="table">
       <table>
         <thead><tr><th>File</th><th>What</th><th>Print</th></tr></thead>
@@ -159,7 +164,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
           <tr><td><a href="/models/stl/base.stl" download>base.stl</a></td><td>Clamshell: keyboard tray and hinge</td><td>Floor down, no supports</td></tr>
           <tr><td><a href="/models/stl/lid.stl" download>lid.stl</a></td><td>Clamshell: slide-in phone bay and hinge knuckles</td><td>Back plate down, tree supports under the knuckles</td></tr>
           <tr><td><a href="/models/stl/fit_keyboard.stl" download>fit_keyboard.stl</a><br><a href="/models/stl/fit_phone.stl" download>fit_phone.stl</a></td><td>Fit tests: a slice of the keyboard pocket, the left end of the clamshell's phone bay</td><td>Before the full parts, to try the fit</td></tr>
-          <tr><td><a href="/models/stl/slate.stl" download>slate.stl</a></td><td>Slate: phone on top, keyboard below, one piece</td><td>Back down, no supports; a 0.2 mm skin under the frame lips is cut out of the screen window afterwards</td></tr>
+          <tr><td><a href="/models/stl/slate.stl" download>slate.stl</a></td><td>Slate: phone on top, keyboard below, one piece</td><td>Back down, tree supports from the bed only; cut the 0.2 mm skins out of the screen and camera windows afterwards</td></tr>
           <tr><td><a href="/models/stl/radius_gauge.stl" download>radius_gauge.stl</a></td><td>Corner radius gauge, 7–11.5 mm, for a different phone or keyboard</td><td>Flat</td></tr>
           <tr><td><a href="/models/stl/radius_gauge_case.stl" download>radius_gauge_case.stl</a><br><a href="/models/stl/radius_gauge_lid.stl" download>radius_gauge_lid.stl</a></td><td>Case and sliding lid for the gauge tiles</td><td>Upright and flat, no supports</td></tr>
         </tbody>
@@ -178,7 +183,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
       </figure>
       <figure>
         <img src="/img/slate_hero-red-960.jpg" width="960" height="640" loading="lazy" alt="A flat one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
-        <figcaption>Slate: one flat piece, 138 × 140 × 12 mm.</figcaption>
+        <figcaption>Slate: one flat piece, 138 × 140 × 13.4 mm.</figcaption>
       </figure>
     </div>
   </section>
@@ -232,17 +237,26 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const M = '/models/';
 const box = document.getElementById('viewer'), status = document.getElementById('status'), dl = document.getElementById('download');
-const BLACK = 0x2a2a2f, GREY = 0xb8b8b8, GLASS = 0x0c0e12, CASE = 'case';   // CASE: the part the colour swatches paint
+const BLACK = 0x2a2a2f, GREY = 0xb8b8b8, GLASS = 0x0c0e12, SUPPORT = 0xe8a33d, CASE = 'case';   // CASE: the part the colour swatches paint
 const COLORS = { red: 0xa3162b, white: 0xdcdcd8, mint: 0x94deba, black: 0x2a2a2f };
 let colour = 'red';
-const dims = await fetch(M + 'render/dims.json').then(r => r.json());
+const [dims, sdims] = await Promise.all(['render/dims.json', 'render/slate/dims.json'].map(f => fetch(M + f).then(r => r.json())));
+// Each view's parts; parts sharing a name share a tick box. hinged: turns with the lid; flip: a face-down slate mesh, shown
+// face up like the print file. Supports are the slicer's (and the slate's print skins), cut away after printing.
+const SUPPORTS = 'Supports (cut away after printing)';
 const VIEWS = {
-  clamshell: [['render/base.stl', BLACK], ['render/kb_body.stl', GREY], ['render/lid.stl', CASE, true], ['render/phone.stl', GLASS, true]],
-  base: [['stl/base.stl', BLACK]],
-  lid: [['stl/lid.stl', CASE]],
-  slate: [['stl/slate.stl', CASE]],
-  gauge: [['stl/radius_gauge.stl', CASE]],
+  clamshell: { parts: [{ name: 'Base', path: 'render/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY },
+                       { name: 'Lid', path: 'render/lid.stl', color: CASE, hinged: true }, { name: 'Phone', path: 'render/phone.stl', color: GLASS, hinged: true }] },
+  base: { file: 'stl/base.stl', parts: [{ name: 'Base', path: 'stl/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY }] },
+  lid: { file: 'stl/lid.stl', parts: [{ name: 'Lid', path: 'stl/lid.stl', color: CASE }, { name: SUPPORTS, path: 'render/supports/lid.bin', color: SUPPORT }] },
+  slate: { file: 'stl/slate.stl', parts: [{ name: 'Slate', path: 'render/slate/slate.stl', color: CASE, flip: true },
+                                          { name: 'Keyboard', path: 'render/slate/kb_body.stl', color: GREY },
+                                          { name: 'Phone', path: 'render/slate/phone.stl', color: GLASS, flip: true },
+                                          { name: SUPPORTS, path: 'render/supports/slate.bin', color: SUPPORT },
+                                          { name: SUPPORTS, path: 'render/slate/skins.stl', color: SUPPORT, flip: true }] },
+  gauge: { file: 'stl/radius_gauge.stl', parts: [{ name: 'Gauge', path: 'stl/radius_gauge.stl', color: CASE }] },
 };
+const hidden = new Set([SUPPORTS]);   // ticks carry across views
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -258,8 +272,27 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
 const loader = new STLLoader(), cache = {};
-const geometry = path => cache[path] ??= loader.loadAsync(M + path);
+const geometry = path => cache[path] ??= path.endsWith('.bin') ? fetch(M + path).then(r => r.arrayBuffer()).then(lines) : loader.loadAsync(M + path);
+// render/supports.py's int16 lines (x0 y0 x1 y1 z h, 0.01 mm) as 0.4 mm wide extrusions: top, bottom and both sides.
+function lines(buf) {
+  const a = new Int16Array(buf), pos = [], w = 0.2;
+  for (let i = 0; i < a.length; i += 6) {
+    const [x0, y0, x1, y1, z, h] = Array.from(a.subarray(i, i + 6), v => v / 100), l = Math.hypot(x1 - x0, y1 - y0);
+    if (!l) continue;
+    const nx = -(y1 - y0) / l * w, ny = (x1 - x0) / l * w, zb = z - h;
+    const c = [[x0 + nx, y0 + ny], [x1 + nx, y1 + ny], [x1 - nx, y1 - ny], [x0 - nx, y0 - ny]];
+    const quad = (p, q, r, s) => pos.push(...p, ...q, ...r, ...p, ...r, ...s);
+    quad([...c[0], z], [...c[3], z], [...c[2], z], [...c[1], z]);       // top
+    quad([...c[0], zb], [...c[1], zb], [...c[2], zb], [...c[3], zb]);   // bottom
+    quad([...c[0], zb], [...c[0], z], [...c[1], z], [...c[1], zb]);     // sides
+    quad([...c[2], zb], [...c[2], z], [...c[3], z], [...c[3], zb]);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  return g;
+}
 let group, shown, pivot, angle, target = null, last = 0;
+const partsBox = document.getElementById('parts');
 const hinge = document.getElementById('hinge'), swing = document.getElementById('swing'), slider = document.getElementById('angle'), deg = document.getElementById('deg');
 slider.max = dims.OPEN.toFixed(1);
 function setAngle(a) {
@@ -270,17 +303,18 @@ function setAngle(a) {
 async function show(name) {
   shown = name;
   status.textContent = 'Loading…'; dl.textContent = '';
-  const parts = VIEWS[name];
+  const { parts, file } = VIEWS[name];
   let meshes;
   try {
-    meshes = await Promise.all(parts.map(async ([path, color, hinged]) => {
+    meshes = await Promise.all(parts.map(async ({ name: part, path, color, hinged, flip }) => {
       const g = (await geometry(path)).clone();
       // The render meshes are modelled closed; the lid and phone turn about the hinge axis (x, through YA, ZA).
       if (hinged) g.translate(0, -dims.YA, -dims.ZA);
+      if (flip) { g.rotateX(Math.PI); g.translate(0, sdims.L, sdims.T); }
       g.computeVertexNormals();
       const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: color === CASE ? COLORS[colour] : color, roughness: 0.55 }));
-      m.userData.case = color === CASE;
-      m.userData.hinged = hinged;
+      Object.assign(m.userData, { case: color === CASE, hinged, part });
+      m.visible = !hidden.has(part);
       return m;
     }));
   } catch { status.textContent = 'Could not load the model. The files are listed below.'; return; }
@@ -292,12 +326,26 @@ async function show(name) {
   group.add(pivot); scene.add(group);
   hinge.hidden = !meshes.some(m => m.userData.hinged);
   setAngle(dims.OPEN);
-  const b = new THREE.Box3().setFromObject(group), c = b.getCenter(new THREE.Vector3()), size = b.getSize(new THREE.Vector3()).length();
+  const names = [...new Set(parts.map(p => p.name))];
+  partsBox.hidden = names.length < 2;
+  partsBox.replaceChildren(...names.map(n => {
+    const label = document.createElement('label'), box = document.createElement('input');
+    box.type = 'checkbox'; box.checked = !hidden.has(n);
+    box.addEventListener('change', () => {
+      box.checked ? hidden.delete(n) : hidden.add(n);
+      group.traverse(m => { if (m.userData.part === n) m.visible = box.checked; });
+    });
+    label.append(box, n);
+    return label;
+  }));
+  group.updateMatrixWorld(true);   // frame the parts themselves; the supports reach out past them
+  const b = new THREE.Box3(); meshes.forEach(m => m.userData.part !== SUPPORTS && b.expandByObject(m));
+  const c = b.getCenter(new THREE.Vector3()), size = b.getSize(new THREE.Vector3()).length();
   controls.target.copy(c);
   camera.position.copy(c).add(new THREE.Vector3(0.75, -1.3, 0.9).normalize().multiplyScalar(size * 1.6 / Math.min(1, camera.aspect)));
   camera.near = size / 100; camera.far = size * 20; camera.updateProjectionMatrix();
   status.textContent = `${size.toFixed(0)} mm across`;
-  if (parts.length === 1) dl.innerHTML = `<a href="${M + parts[0][0]}" download>Download ${parts[0][0].split('/').pop()}</a>`;
+  if (file) dl.innerHTML = `<a href="${M + file}" download>Download ${file.split('/').pop()}</a>`;
 }
 
 function resize() {

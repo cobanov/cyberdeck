@@ -17,9 +17,6 @@ M3_CLR, M3_TAP, M3_HEAD = 3.3, 2.7, 6.0
 M3_PIN = 3.1             # lid knuckle bore, snug on the screw shank so the lid can't rattle; ream with a 3 mm drill if tight
 TIP = 1.6                # landing web stops this far from the axis instead of a knife edge
 
-# Keyboard port/switch slots: (side, mm from keyboard's left edge (front/back) or front edge (left/right), width)
-KB_CUTOUTS = [("back", 28 - 7.5, 15)]   # USB-C on the back edge, centred ~28 mm from the left; slot fits the plug overmould
-
 R_BACK = EDGE_R                                     # back corners square: the outer knuckles run out to the back face
 HB = FLOOR + KB_KEYS + KEY_GAP
 YA, ZA = D + HR + HG, HB         # hinge axis

@@ -19,10 +19,14 @@ LEAD = 1.0               # 45 deg lead-in round the phone bay's open end
 MOUTH_R = GRIP_R + 0.5   # outer corner at the bay's open end: R_OUT there ran out into a knife edge along the 2 mm rail;
                          # just over GRIP_R so the back fillet still runs round it
 
-# The keyboard's housing sits KB_SINK below the screen face, its keys stand proud. With the pocket exactly KB_BODY deep
-# (2026-11-01) the housing stayed 0.5-1 mm proud and sprang back out: the walls only hold it once its top edge is inside.
+# The keyboard's housing sits KB_SINK below the screen face, its key tops 1.2 mm below it. With the pocket exactly KB_BODY
+# deep (2026-11-01) the housing stayed 0.5-1 mm proud and sprang back out; 1.2 mm down it still sat flush. It
+# held in the clamshell base, which is deeper and has a slot at the USB-C port; the slate had neither.
 # Printed back down, so the thickness is rounded up to whole layers to keep the phone bay's heights on layer lines.
-KB_SINK = 1.2
+KB_SINK = 2.7
+NOTCH = 1.3              # USB-C relief into the 2 mm wall between keyboard and phone: 1.7 mm of room with KB_CLR, and the
+                         # wall's face edge keeps 0.7 mm (it opens into the phone's button groove, behind the screen frame)
+CHAMFER = 0.6            # where hands touch: the keyboard pocket's rim, and the windows in the back
 BACK = 1.2               # floor behind the keyboard; the push-out window leaves only a 13 mm frame of it
 T = math.ceil((KB_BODY + KB_SINK + BACK) / LAYER - 1e-6) * LAYER
 YK = D                                            # keyboard pocket's top wall
@@ -43,7 +47,24 @@ def make_slate():
     s = phone_bay(s, 0, T, latch=False, lead=LEAD)
     s = s.cut(rbox(PW, PD, KB_BODY + KB_SINK + 1, CORNER_R + KB_CLR, WALL, YK, -1))            # keyboard pocket
     s = s.cut(rbox(W - 30, PD + 2 * WALL - 30, BACK + 2, 4, 15, YK - WALL + 15, T - BACK - 1))     # push-out window, as the base's
-    return s.removeSplitter()
+    for side, pos, width in KB_CUTOUTS:   # the keyboard's back edge faces the phone; 45 deg ends, so no edge is square
+        assert side == "back", "slate has slots on the keyboard's back edge only"
+        x0, x1, y = KX + pos, KX + pos + width, YK - NOTCH
+        ends = Part.Face(Part.makePolygon([V(x0 - NOTCH - 0.5, YK + 0.5, -1), V(x0, y, -1), V(x1, y, -1),
+                                           V(x1 + NOTCH + 0.5, YK + 0.5, -1), V(x0 - NOTCH - 0.5, YK + 0.5, -1)]))
+        s = s.cut(ends.extrude(V(0, 0, KB_BODY + KB_SINK + 1)))
+    s = s.removeSplitter()
+    rim = [e for e in s.Edges if e.BoundBox.ZMax < 1e-6 and e.BoundBox.YMin > YK - NOTCH - 0.1 and square(s, e)]
+    back = [e for e in s.Edges if e.BoundBox.ZMin > T - 1e-6 and square(s, e)]
+    return s.makeChamfer(CHAMFER, rim + back).removeSplitter()
+
+
+def square(s, e):
+    """True for an edge whose two faces meet at 80 deg or sharper (outer edges are filleted, so they meet smoothly)."""
+    f = s.ancestorsOfType(e, Part.Face)
+    p = e.valueAt((e.FirstParameter + e.LastParameter) / 2)
+    n = [g.normalAt(*g.Surface.parameter(p)) for g in f]
+    return len(f) == 2 and n[0].getAngle(n[1]) > math.radians(80)
 
 
 slate = make_slate()
@@ -68,17 +89,20 @@ doc.saveAs(os.path.join(DIR, "slate.FCStd"))
 
 # STL in print orientation: back down. A one-layer skin closes the screen window at the lips' underside, so the slicer
 # bridges the lips across the bay's 65 mm width, wall to wall. Bridged lengthwise (126 mm) they sagged; on tree supports
-# the supports fused under them and couldn't be removed.
-slate_p = slate.fuse(screen_window(LIP_T - LAYER, LAYER)).removeSplitter()
+# grown from the part the supports fused under them and couldn't be removed. Supports now grow from the bed only, to
+# carry the frame over the open end; a first-layer skin closes the camera window so none climb into the bay through it.
+skins = screen_window(LIP_T - LAYER, LAYER).fuse(camera_window(T - LAYER, LAYER, CHAMFER))
+slate_p = slate.fuse(skins).removeSplitter()
 slate_p.rotate(V(0, 0, 0), V(1, 0, 0), 180)
-slate_p.translate(V(0, -slate_p.BoundBox.YMin, -slate_p.BoundBox.ZMin))
+slate_p.translate(V(0, L, T))   # exactly the face-up frame the site's viewer shows (BoundBox is loose round fillets)
 MeshPart.meshFromShape(Shape=slate_p, LinearDeflection=0.05, AngularDeflection=0.2).write(os.path.join(DIR, "stl", "slate.stl"))
 
-# Meshes for render/scene.py --slate: body and phone face down (the scene flips them about YA, ZA), keyboard face up.
+# Meshes for render/scene.py --slate and the site's viewer: body, phone and the print skins face down (both flip them
+# about YA, ZA), keyboard face up.
 out = os.path.join(DIR, "render", "slate")
 os.makedirs(out, exist_ok=True)
 kb_body = rbox(KB_W, KB_D, KB_BODY, CORNER_R, WALL + KB_CLR, WALL + KB_CLR, T - KB_BODY - KB_SINK)
-for name, shape in [("slate", slate), ("kb_body", kb_body), ("phone", phone)]:
+for name, shape in [("slate", slate), ("kb_body", kb_body), ("phone", phone), ("skins", skins.cut(slate))]:
     MeshPart.meshFromShape(Shape=shape, LinearDeflection=0.02, AngularDeflection=0.1).write(os.path.join(out, name + ".stl"))
 dims = {k: globals()[k] for k in ("W", "D", "HL", "YA", "ZA", "T", "L", "KB_W", "KB_D", "KB_BODY", "KB_KEYS",
                                   "WALL", "KB_CLR", "FLOOR", "PH_W", "PH_D", "PH_T", "LIP_T", "PX", "PPW",

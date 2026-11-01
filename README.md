@@ -15,24 +15,26 @@ at [cyberdeck.cobanov.dev](https://cyberdeck.cobanov.dev).
 ## Highlights
 
 - **Matched footprints.** The keyboard (133 × 68 mm) and the phone (131.5 × 64.2 mm) are almost the same size. The
-  clamshell closes to 138 × 81 × 24.5 mm; the slate is 138 × 140 × 12 mm.
+  clamshell closes to 138 × 81 × 24.5 mm; the slate is 138 × 140 × 13.4 mm.
 - **Slide-in phone, one-piece frame.** The phone slides in from the left between the back plate and a lip that runs
   all the way round the screen. The lip covers 1 mm of the phone's 3.3 mm black border, never the screen. A flexing
   tongue in the plate clicks in behind the clamshell's phone; the slate's holds it by its snug fit alone. The camera
   bump slides along a groove into its own window. The side button has a flared window; grooves keep the buttons from
-  being pressed as the phone slides in. The slate's bay opens with a 45° lead-in on its rails and plate.
+  being pressed as the phone slides in. The slate's bay opens with a 45° lead-in on its rails, plate and camera groove, and a gentler ramp under the frame.
 - **Keys at rim height.** In the clamshell the rim stands 0.3 mm above the key tops, so edge keys are easy to press.
   With it closed only the screen glass faces the keys, 1.5 mm above them. In the slate the keyboard's housing sits
-  1.2 mm below the screen face and the keys stand just proud of it.
+  2.7 mm below the screen face and the key tops 1.2 mm below it. A notch at its USB-C port leaves room for the port.
 - **Clamshell stops at 112°.** A web across the back of the lid lands flat on the base just behind the hinge pins.
   Open, the lid and phone weigh behind the axis, so gravity keeps the lid on its stop and taps on the screen push
   into it. The base ends at the hinge, with nothing sticking out behind. Pull the lid forward to close it. A slot
   behind the keyboard fits a USB-C plug to charge it in place.
 - **Both hold the keyboard without glue.** It presses into a pocket 0.4 mm larger all round and stays by friction;
   a window in the back pushes it out again.
-- **Made to print.** Every part prints in one piece. The lid needs supports under its two hinge knuckles; the slate
-  needs none. Its print STL closes the screen window with a 0.2 mm skin under the frame lips, so the lips bridge the
-  65 mm across the bay from wall to wall; cut the skin out after printing. The frame's
+- **Made to print.** Every part prints in one piece. The lid needs supports under its two hinge knuckles. The slate's
+  print STL closes the screen window with a 0.2 mm skin under the frame lips, so the lips bridge the 65 mm across the
+  bay from wall to wall, and the camera window with a skin on the first layer; cut both out after printing. Its
+  supports grow from the bed only, outside the bay's open end and the side windows, so none are trapped inside. The
+  keyboard pocket's rim and the windows in the back are chamfered. The frame's
   left end bridges the 65 mm phone slot one layer above the side lips, so the slicer spans it wall to wall. Every
   flexing part bends along its layers, and the phone bay's heights sit on layer lines.
 - **Self-checking.** The scripts assert that the lid swings clear up to the stop, the stop engages and the lid's weight holds it open, that the
@@ -49,11 +51,11 @@ Creality K1, the `PLA @K1 cobanov` preset (Elas PLA Pro values), 0.2 mm layers, 
 | `stl/fit_keyboard.stl`, `stl/fit_phone.stl` | Clamshell: keyboard pocket slice; left end of the phone bay | One plate, before the base and lid: try the slide and click | 26 min | 10 g |
 | `stl/base.stl` | Clamshell: keyboard tray and hinge | Floor down, no supports | 57 min | 32 g |
 | `stl/lid.stl` | Clamshell: phone bay, hinge knuckles | Plate down, tree supports under the knuckles | 1 h 22 min | 37 g |
-| `stl/slate.stl` | Slate | Back down, no supports, screen face ironed; cut the skin out of the screen window | 1 h 38 min | 47 g |
+| `stl/slate.stl` | Slate | Back down, tree supports from the bed, screen face ironed; cut the skins out of the screen and camera windows | 2 h 2 min | 55 g |
 | `stl/radius_gauge.stl` | Corner radius gauge, 7–11.5 mm | Flat; only for a different keyboard or phone | 31 min | 13 g |
 | `stl/radius_gauge_case.stl`, `stl/radius_gauge_lid.stl` | Case for the gauge tiles, sliding lid | Upright and flat, no supports | 32 min | 15 g |
 
-The clamshell is about 2 h 20 min and 69 g; the slate 1 h 38 min and 47 g. No part needs a brim or a skirt (the
+The clamshell is about 2 h 20 min and 69 g; the slate 2 h 2 min and 55 g. No part needs a brim or a skirt (the
 K1 draws its own purge line). The frame lips bridge 60–120 mm over the phone slot and sagged slightly on the part
 fan alone, so `slice_k1.sh` switches the side fan on for bridges only (it stays off otherwise, since it blows on the
 bed).
@@ -75,8 +77,9 @@ knuckles. From each side, drive an M3×20 through the counterbored outer knuckle
 knuckle. The screw is the hinge pin, and tightening it adds friction. The lid's bore is 3.1 mm so the shank sits
 snugly; if it binds, run a 3 mm drill through. Drop the keyboard into the tray.
 
-**Slate.** Cut the skin out of the screen window: run a utility knife along the frame's inner edge, or push its middle
-down until it breaks away along the edge. Press the keyboard in keys up. To remove it, push it out through the window in the back; take it out to
+**Slate.** Snap off the supports outside the open end and the side windows. Cut the skin out of the screen window:
+run a utility knife along the frame's inner edge, or push its middle down until it breaks away along the edge. Push
+the camera window's skin out from the back. Press the keyboard in keys up. To remove it, push it out through the window in the back; take it out to
 charge it.
 
 ## Customizing
@@ -139,5 +142,8 @@ phone latch broke. The key height was remeasured (housing 9.5 mm, keys 1.5 mm pr
 thinner for it too), and the slate was redrawn: no latch, keyboard press-fit and flush, 2 mm walls, 11.6 mm thick
 instead of 14.4, and a lead-in at the phone bay's mouth. That version (white, 2026-11-01) had two faults. The tree
 supports under the lips couldn't be removed from inside the bay. The keyboard's housing stayed 0.5–1 mm proud and
-sprang back out, as its top edge never got inside the pocket. Now the pocket is 1.2 mm deeper (12 mm thick), and a
-one-layer skin replaces the supports.
+sprang back out, as its top edge never got inside the pocket. The pocket went 1.2 mm deeper (12 mm thick), and a
+one-layer skin replaced the supports. That third slate's lips came out flat, but the frame over the open end still
+sagged and the keyboard still sat flush: the clamshell base has a slot at the keyboard's USB-C port, the slate had none.
+Now the slate has the notch, the pocket is 1.5 mm deeper again (13.4 mm thick), bed-only tree supports carry the open
+end, and the sharp edges at the bay's mouth and round the keyboard are chamfered.
