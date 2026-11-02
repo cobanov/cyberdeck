@@ -37,26 +37,27 @@ header { display: flex; align-items: center; gap: 16px; padding: 20px 0; }
 nav { margin-left: auto; display: flex; gap: 20px; font-size: 0.9375rem; }
 nav a { text-decoration: none; color: var(--muted); }
 nav a:hover { color: var(--ink); }
-@media (max-width: 480px) { nav { gap: 14px; } nav .wide { display: none; } }
-.hero { padding: 56px 0 56px; }
-@media (max-width: 760px) { .hero { padding-top: 32px; } }
+@media (max-width: 480px) { nav { gap: 12px; } nav .wide { display: none; } }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 40px; align-items: center; padding: 56px 0; }
+.hero-shot { border: 1px solid var(--rule); border-radius: var(--radius); }
+@media (max-width: 760px) { .hero { grid-template-columns: minmax(0, 1fr); padding-top: 32px; } }
 h1, h2 { font-family: var(--mono); font-weight: 700; text-wrap: balance; }
 h1 { font-size: clamp(2.125rem, 5.5vw, 3.25rem); line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 16px; }
 h2 { font-size: clamp(1.5rem, 3vw, 1.875rem); letter-spacing: -0.02em; margin: 0 0 8px; }
 .lede { font-size: 1.1875rem; color: var(--muted); margin: 0 0 28px; max-width: 40ch; text-wrap: pretty; }
-.actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.btn { display: inline-block; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--rule); background: var(--panel); text-decoration: none; font-size: 0.9375rem; font-weight: 600; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { display: inline-block; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--rule); background: var(--panel); text-decoration: none; font-size: 0.9375rem; font-weight: 600; }
 .btn:hover { border-color: var(--muted); }
 .btn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
-.btn.gh { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: #000; border-color: var(--ink); }
-.btn.gh:hover { background: #fff; border-color: #fff; }
-.callout { margin: 28px 0 0; max-width: 68ch; padding: 14px 16px; border: 1px solid rgb(242 201 76 / 0.4); border-radius: var(--radius); background: rgb(242 201 76 / 0.08); color: var(--ink); }
+.btn.gh { display: inline-flex; align-items: center; gap: 8px; background: none; border-color: var(--ink); }
+.btn.gh:hover { background: var(--soft); }
+.callout { grid-column: 1 / -1; margin: 0; max-width: 68ch; padding: 16px; border: 1px solid rgb(242 201 76 / 0.24); border-radius: var(--radius); background: rgb(242 201 76 / 0.08); color: var(--ink); }
 .callout strong { color: var(--warn); }
-.callout a { color: var(--warn); }
 section { margin-bottom: 72px; }
 .sub { color: var(--muted); margin: 0 0 24px; font-size: 1.0625rem; }
 .note { color: var(--muted); font-size: 0.875rem; margin: 12px 0 0; }
-.note a, .sub a, .lede a { color: var(--accent); }
+.note a, .sub a, .lede a { color: var(--ink); text-underline-offset: 2px; }
+.mm { font-family: var(--mono); font-size: 0.9375em; color: var(--ink); white-space: nowrap; }   /* measurements read like a caliper */
 .modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; max-width: 880px; margin: 0 auto 16px; padding: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius); }
 .modes button { display: grid; gap: 2px; padding: 8px 12px; border: 0; border-radius: 4px; background: none; color: var(--ink); font: 600 1rem var(--sans); cursor: pointer; transition: background-color .15s, color .15s; }
 @media (max-width: 760px) { .modes { grid-template-columns: 1fr 1fr; } }
@@ -72,7 +73,7 @@ section { margin-bottom: 72px; }
 .hinge button:hover { border-color: var(--muted); }
 .viewer { position: relative; height: clamp(320px, 62vh, 640px); background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; touch-action: none; }
 .viewer canvas { display: block; width: 100%; height: 100%; }
-.status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; color: var(--muted); font-size: 0.875rem; display: flex; justify-content: space-between; gap: 16px; pointer-events: none; }
+.status { position: absolute; inset: auto 0 0 0; padding: 12px 16px; color: var(--muted); font-size: 0.875rem; display: flex; justify-content: space-between; gap: 16px; pointer-events: none; }
 .status a { pointer-events: auto; color: var(--accent); }
 .parts { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .parts[hidden] { display: none; }
@@ -85,7 +86,7 @@ section { margin-bottom: 72px; }
 /* The table scrolls inside its frame on a phone; the page never does. */
 .table { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--panel); }
 table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 0.9375rem; }
-th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--rule); vertical-align: top; }
 tbody tr:last-child > * { border-bottom: 0; }
 th { color: var(--muted); font-weight: 600; font-size: 0.875rem; }
 td:first-child { font-family: var(--mono); white-space: nowrap; }
@@ -102,7 +103,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .foot a, .legal a { text-decoration: none; }
 .foot a:hover, .legal a:hover { text-decoration: underline; }
-.about .brand { display: inline-block; margin-bottom: 10px; }
+.about .brand { display: inline-block; margin-bottom: 12px; }
 .about p { margin: 0 0 6px; color: var(--muted); max-width: 30ch; }
 .legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 16px 0 28px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.875rem; }
 </style>
@@ -127,43 +128,45 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
 
 <main>
   <div class="hero">
-    <h1>A pocket deck you can print.</h1>
+    <div>
+    <h1>A pocket deck you can print</h1>
     <p class="lede">An iPhone 12 mini and a mini Bluetooth keyboard in a 3D-printed shell: a clamshell with a hinged lid, or a one-piece slate. The phone runs <a href="https://deckterm.cobanov.dev">DeckTerm</a>, an SSH terminal made for landscape and the keyboard.</p>
     <div class="actions">
       <a class="btn primary" href="#files">Download the STL files</a>
-      <a class="btn" href="https://github.com/cobanov/cyberdeck#readme">Read the build notes</a>
       <a class="btn" href="https://deckterm.cobanov.dev">Get DeckTerm</a>
-      <a class="btn gh" href="https://github.com/cobanov/cyberdeck"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>View on GitHub</a>
+      <a class="btn gh" href="https://github.com/cobanov/cyberdeck"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
     </div>
+    </div>
+    <img class="hero-shot" src="/img/cyberdeck_front-960.jpg" width="960" height="640" alt="The mint clamshell open on an oak desk, seen from the front: a terminal on the phone in the lid, the keyboard in the black base.">
     <p class="callout" role="note"><strong>Help wanted: the hinge.</strong> The clamshell's hinge is its weakest part: two M3 screws are the pins, nothing holds the lid shut, and a tenth of a millimetre of print error moves the 112° stop by about 2°. The project is open source. If you design hinges or enclosures for a living, your help is very welcome: open an <a href="https://github.com/cobanov/cyberdeck/issues">issue</a> or a pull request on GitHub.</p>
   </div>
 
   <section aria-labelledby="builds">
     <h2 id="builds">Four builds</h2>
-    <p class="sub">The same phone and keyboard, hinged or flat, the phone held by MagSafe or slid into a frame.</p>
+    <p class="sub">The same phone and keyboard, hinged or flat, the phone held by MagSafe or slid into a frame</p>
     <div class="builds">
       <figure>
         <img src="/img/cyberdeck_render-mint-960.jpg" width="960" height="640" alt="A clamshell deck, open on a wooden table: an iPhone in the lid shows a terminal, a compact keyboard sits in the base.">
-        <figcaption>Clamshell: 138 × 81 × 24.5 mm closed, the lid opens to 112°.</figcaption>
+        <figcaption>Clamshell: <span class="mm">138 × 81 × 24.5 mm</span> closed, the lid opens to <span class="mm">112°</span></figcaption>
       </figure>
       <figure>
         <img src="/img/slate_hero-mint-960.jpg" width="960" height="640" alt="A flat one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
-        <figcaption>Slate: one flat piece, 138 × 140.5 × 13.4 mm.</figcaption>
+        <figcaption>Slate: one flat piece, <span class="mm">138 × 140.5 × 13.4 mm</span></figcaption>
       </figure>
       <figure>
         <img src="/img/slide-in_clamshell-960.jpg" width="960" height="640" alt="A red clamshell deck, open on a wooden table: an iPhone framed in the lid, a compact keyboard in the black base.">
-        <figcaption>Slide-in clamshell: the phone slides into the lid and a tab clicks in behind it. No ring sticker.</figcaption>
+        <figcaption>Slide-in clamshell: the phone slides into the lid and a tab clicks in behind it, no ring sticker needed</figcaption>
       </figure>
       <figure>
         <img src="/img/slide-in_slate-960.jpg" width="960" height="640" alt="A red one-piece slate on a wooden table, the iPhone held in a frame above a compact keyboard.">
-        <figcaption>Slide-in slate: the phone slides into a frame and stays by its snug fit. No ring sticker.</figcaption>
+        <figcaption>Slide-in slate: the phone slides into a frame and stays by its snug fit, no ring sticker needed</figcaption>
       </figure>
     </div>
   </section>
 
   <section aria-labelledby="models">
     <h2 id="models">Models</h2>
-    <p class="sub">Drag to turn, scroll or pinch to zoom, right-drag or two fingers to move.</p>
+    <p class="sub">Drag to turn, scroll or pinch to zoom, right-drag or two fingers to move</p>
     <div class="modes" role="group" aria-label="Build">
       <button data-view="clamshell" aria-pressed="true">Clamshell<small>Hinged lid, MagSafe</small></button>
       <button data-view="slate" aria-pressed="false">Slate<small>One flat piece, MagSafe</small></button>
@@ -219,8 +222,8 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
     <div class="foot">
       <div class="about">
         <a class="brand" href="/">cyberdeck<span>_</span></a>
-        <p>A pocket deck you can print.</p>
-        <p>Free STL files and the FreeCAD scripts that make them.</p>
+        <p>A pocket deck you can print</p>
+        <p>Free STL files and the FreeCAD scripts that make them</p>
       </div>
       <div>
         <h3>Models</h3>
@@ -249,7 +252,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
     </div>
     <div class="legal">
       <span>Made by <a href="https://cobanov.dev">Mert Cobanov</a></span>
-      <span>Printed and tested on a Creality K1 in PLA.</span>
+      <span>Printed and tested on a Creality K1 in PLA</span>
     </div>
   </div>
 </footer>
@@ -353,7 +356,7 @@ async function show(name) {
   controls.target.copy(c);
   camera.position.copy(c).add(new THREE.Vector3(0.75, -1.3, 0.9).normalize().multiplyScalar(size * 1.6 / Math.min(1, camera.aspect)));
   camera.near = size / 100; camera.far = size * 20; camera.updateProjectionMatrix();
-  status.textContent = `${size.toFixed(0)} mm across`;
+  status.innerHTML = `<span class="mm">${size.toFixed(0)} mm</span> across`;
   if (file) dl.innerHTML = `<a href="${M + file}" download="${file.slice(4).replace('/', '_')}">Download ${file.slice(4)}</a>`;
 }
 
