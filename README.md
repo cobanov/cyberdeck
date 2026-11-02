@@ -4,7 +4,7 @@ A pocket deck you can print: an iPhone 12 mini and a Torima M7 mini Bluetooth ke
 builds.
 
 - **Clamshell.** The keyboard sits in the base, the phone in a lid that stays open at 112°. 138 × 81 × 24.5 mm closed.
-- **Slate.** One flat piece, phone above the keyboard. 138 × 141 × 13.4 mm.
+- **Slate.** One flat piece, phone above the keyboard. 138 × 140.5 × 13.4 mm.
 
 In both, the phone drops into an open pocket, and its own MagSafe magnets hold it to a steel ring sticker. There is
 nothing over the screen and no latch to break.
@@ -33,9 +33,9 @@ These times and weights are for a Creality K1 in PLA: 0.2 mm layers, 3 walls, 20
 
 | File | Part | How | Time | PLA |
 |---|---|---|---|---|
-| `stl/slate.stl` | Slate | Back down, no supports | 1 h 33 min | 53 g |
+| `stl/slate.stl` | Slate | Back down, no supports | 1 h 32 min | 53 g |
 | `stl/base.stl` | Clamshell base | Floor down, no supports | 57 min | 32 g |
-| `stl/lid.stl` | Clamshell lid | Back down, supports under the two hinge knuckles | 1 h 4 min | 34 g |
+| `stl/lid.stl` | Clamshell lid | Back down, supports under the two hinge knuckles | 1 h 4 min | 35 g |
 | `stl/slide-in/lid.stl` | Slide-in clamshell lid, no ring sticker (the earlier design, with the same base) | Plate down, tree supports under the knuckles | 1 h 22 min | 37 g |
 | `stl/slide-in/slate.stl` | Slide-in slate, no ring sticker (the earlier design) | Back down, tree supports from the bed; cut the skins out of the screen and camera windows | 2 h 2 min | 55 g |
 | `stl/fit_keyboard.stl` | A slice of the keyboard pocket, to try the fit | Flat | 7 min | 3 g |
@@ -63,7 +63,8 @@ freecadcmd slate.py        # or cyberdeck.py, radius_gauge.py
 Each script rebuilds its `.FCStd`, STLs and render meshes. In FreeCAD's Python console, use
 `p = "<repo>/slate.py"; exec(open(p).read(), {"__file__": p})`. You'll most likely change these:
 
-- `RING_D`, and `MAG_DX` and `MAG_DY`: your ring sticker's diameter, and its offset from the phone's centre.
+- `RING_D`, your ring sticker's diameter. `MAG_DX` and `MAG_DY` move the ring off the phone's centre; leave them at 0
+  for the iPhone 12 mini, whose MagSafe sits at the centre on Apple's dimensional drawing.
 - `CORNER_R`, the corner radius shared by the phone and keyboard. Print the radius gauge and find the tile whose
   arc touches all along.
 
@@ -81,8 +82,11 @@ blender -b -P render/scene.py -- --render [--slate] [--color=mint|white|black] [
 
 ## Status
 
-The first clamshell and four slates printed in October and November 2026; the git log has what each one taught. The
-MagSafe lid and slate have not been printed yet. Nothing holds the clamshell's lid closed, and the keyboard has to come
+The first clamshell and five slates printed in October and November 2026; the git log has what each one taught. The
+MagSafe slate printed on 1 November and fit well. Since then the side-key slot has moved to the button's place on
+[Apple's dimensional drawing](https://developer.apple.com/accessories/dimensional-drawings/), the phone's clearance is
+0.25 mm, and the slate's bed edge has a 1 mm chamfer so its camera corner doesn't lift. Those changes and the MagSafe
+lid haven't been printed yet. Nothing holds the clamshell's lid closed, and the keyboard has to come
 out of the slate to charge.
 
 The phone runs [DeckTerm](https://github.com/cobanov/deckterm), a landscape SSH terminal made for this deck.

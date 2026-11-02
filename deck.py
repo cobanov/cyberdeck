@@ -13,11 +13,15 @@ KB_INSET = 3.0           # key field starts this far in from the housing edge (r
 # Keyboard port/switch slots: (side, mm from keyboard's left edge (front/back) or front edge (left/right), width)
 KB_CUTOUTS = [("back", 28 - 7.5, 15)]   # USB-C on the back edge, centred ~28 mm from the left; slot fits the plug overmould
 PH_W, PH_D, PH_T = 131.5, 64.2, 7.4   # iPhone 12 mini, Apple spec
+# Apple's iPhone 12 mini dimensional drawing (developer.apple.com/accessories/dimensional-drawings): the side button is
+# 17.8 mm long, centred 43.68 mm from the top edge and mid-thickness; the camera plateau runs 1.67-33.95 mm along the
+# top-left corner and 1.67-30.76 mm across it, 0.73 mm proud; MagSafe is centred on the product centre.
+SIDE_KEY = 43.68
 CORNER_R = 10.0          # keyboard and iPhone 12 mini share this corner radius, both measured with stl/radius_gauge.stl
                          # too large binds the corners once it exceeds the real radius by ~1 mm; too small only leaves gaps
 
 # --- fit ---
-KB_CLR, PH_CLR = 0.4, 0.5
+KB_CLR, PH_CLR = 0.4, 0.25   # PH_CLR 0.5 let the phone shift ~1 mm in the printed slate (2026-11-01)
 WALL, FLOOR, PLATE = 2.0, 2.0, 2.0
 KEY_GAP = 0.3            # rim above key tops: edge keys stay easy to press
 RING = 0.6               # MagSafe steel ring sticker behind the phone, in a recess in the pocket's floor
@@ -27,8 +31,7 @@ LAYER = 0.2              # print layer height: the phone pocket's heights sit on
 
 # --- the phone drops in screen out; its own MagSafe magnets hold it to the ring sticker ---
 RING_D = 58.0            # ring recess diameter: common stickers are 56 mm across; measure yours
-MAG_DX, MAG_DY = 0.0, 0.0   # ring centre from the phone's centre (the Apple logo); stick the ring on the phone, where its
-                            # magnets centre it, and measure if it sits off-centre
+MAG_DX, MAG_DY = 0.0, 0.0   # ring centre from the phone's centre: Apple's drawing puts MagSafe exactly there
 CHAMFER = 0.6            # every convex square edge: rims, slots, windows
 CHAMFER_THIN = 0.3       # where there's no room for CHAMFER: the ring recess, the volume-button groove, the camera
                          # window's rim (0.6 mm from the pocket's corner), and the Lightning slot's sloped ends
@@ -85,7 +88,7 @@ def phone_pocket(s, z0, back, sink=0.0):
     s = s.cut(Part.makeCylinder(RING_D / 2, RING + 1, V(mx, my, zf - 1)))   # MagSafe ring recess
     s = s.cut(camera_window(zf - 1, thru))
     s = s.cut(rbox(22, 30, thru, 5, PHONE_X + PH_W - 29, my - 15, zf - 1))  # push the phone out here
-    s = s.cut(notch(PHONE_X + 37.5, 25, z0, zm + 2 - z0, -1, PY + 0.5))      # side key, top edge
+    s = s.cut(notch(PHONE_X + SIDE_KEY, 25, z0, zm + 2 - z0, -1, PY + 0.5))  # side key, top edge (was 37.5: 6 mm off)
     s = s.cut(Part.makeBox(53, 1.3, 4, V(PHONE_X + 8, PY + PPD - 0.5, zm - 2)))   # volume buttons' relief
     # Lightning and speakers: down to the floor; 26 long there so its 45 deg ends reach the face before the corners
     return s.cut(notch(my, 26, z0, zf - z0, PX + PPW - 0.5, W + 1, across_x=False))
@@ -102,6 +105,8 @@ def check_pocket(s, z0, sink=0.0):
         assert ph.translated(v).common(s).Volume > 0.01, f"phone not held by the {what}"
     assert rbox(PH_W, PH_D, zf - z0 + PH_T + 1, CORNER_R, PHONE_X, PHONE_Y, z0 - PH_T - 1).common(s).Volume < 0.01, \
         "something overhangs the phone: it can't lift straight out"
+    key = Part.makeBox(17.8, 1.0, 2.0, V(PHONE_X + SIDE_KEY - 8.9, PHONE_Y - 1.0, z0 + sink + PH_T / 2 - 1))
+    assert key.common(s).Volume < 0.01, "the side key slot doesn't clear the side button"
     sticker = Part.makeCylinder(28, RING, V(*ring_centre(), zf))
     assert sticker.common(s).Volume < 0.01 and sticker.cut(ph.translated(V(0, 0, 1))).Volume < 0.01, \
         "ring sticker doesn't fit its recess under the phone"

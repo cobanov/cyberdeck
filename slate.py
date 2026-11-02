@@ -16,6 +16,8 @@ D = PPD + 2 * WALL
 PY = WALL
 PHONE_Y = PY + PH_CLR
 GRIP_R = 3.0             # back edges, where the hands are
+BED_C = 1.0              # ...but 45 deg where they meet the bed: the 3 mm round alone left a 1.8 mm first-layer strip
+                         # round the camera window, under a 70 deg overhang, and that corner lifted (2026-11-01)
 SEP = 3.0                # wall between phone and keyboard: the volume-button groove and the keyboard's USB-C notch meet
                          # in it, and keep 0.9 mm between them
 
@@ -38,7 +40,8 @@ def make_slate():
     s = rbox(W, L, T, R_OUT)
     flat = [e for e in s.Edges if e.BoundBox.ZLength < 1e-6]
     s = s.makeFillet(EDGE_R, [e for e in flat if e.BoundBox.ZMax < 1e-6])
-    s = s.makeFillet(GRIP_R, [e for e in s.Edges if e.BoundBox.ZLength < 1e-6 and e.BoundBox.ZMin > T - 1e-6])
+    s = s.makeChamfer(BED_C, [e for e in s.Edges if e.BoundBox.ZLength < 1e-6 and e.BoundBox.ZMin > T - 1e-6])
+    s = s.makeFillet(GRIP_R, [e for e in s.Edges if e.BoundBox.ZLength < 1e-6 and abs(e.BoundBox.ZMin - (T - BED_C)) < 1e-6])
     s = phone_pocket(s, 0, T)
     s = s.cut(rbox(PW, PD, KB_BODY + KB_SINK + 1, CORNER_R + KB_CLR, WALL, YK, -1))            # keyboard pocket
     s = s.cut(rbox(W - 30, PD + 2 * WALL - 30, BACK + 2, 4, 15, YK - WALL + 15, T - BACK - 1))     # push-out window, as the base's
