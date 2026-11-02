@@ -4,6 +4,6 @@
 set -e
 cd "$(dirname "$0")"
 rm -rf public/models && mkdir -p public/models
-git -C .. archive HEAD stl render/dims.json render/base.stl render/lid.stl render/phone.stl render/kb_body.stl render/slate \
+git -C .. archive HEAD stl render/dims.json render/base.stl render/lid.stl render/phone.stl render/kb_body.stl render/slate render/slide-in \
   | tar -x -C public/models
 wrangler deploy

@@ -9,6 +9,9 @@ builds.
 In both, the phone drops into an open pocket, and its own MagSafe magnets hold it to a steel ring sticker. There is
 nothing over the screen and no latch to break.
 
+The earlier slide-in versions, where the phone slides into a frame and needs no ring sticker, are in `stl/slide-in/`.
+They come from commit b10fc7d, whose scripts build them; their last revisions haven't been printed.
+
 Turn the models in your browser and download them at **[cyberdeck.cobanov.dev](https://cyberdeck.cobanov.dev)**.
 
 <p>
@@ -33,6 +36,8 @@ These times and weights are for a Creality K1 in PLA: 0.2 mm layers, 3 walls, 20
 | `stl/slate.stl` | Slate | Back down, no supports | 1 h 33 min | 53 g |
 | `stl/base.stl` | Clamshell base | Floor down, no supports | 57 min | 32 g |
 | `stl/lid.stl` | Clamshell lid | Back down, supports under the two hinge knuckles | 1 h 4 min | 34 g |
+| `stl/slide-in/lid.stl` | Slide-in clamshell lid, no ring sticker (the earlier design, with the same base) | Plate down, tree supports under the knuckles | 1 h 22 min | 37 g |
+| `stl/slide-in/slate.stl` | Slide-in slate, no ring sticker (the earlier design) | Back down, tree supports from the bed; cut the skins out of the screen and camera windows | 2 h 2 min | 55 g |
 | `stl/fit_keyboard.stl` | A slice of the keyboard pocket, to try the fit | Flat | 7 min | 3 g |
 | `stl/radius_gauge*.stl` | A corner radius gauge and its case, for another phone or keyboard | Flat | 1 h 3 min | 28 g |
 

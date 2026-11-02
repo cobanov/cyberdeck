@@ -20,7 +20,7 @@
 @font-face { font-family: "JetBrains Mono"; src: url("/fonts/JetBrainsMono-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
 :root {
   color-scheme: dark;
-  --paper: #000; --panel: #101010; --soft: #202020; --ink: #e6e6e6; --muted: #a0a0a0; --rule: #2b2b2b; --accent: #94deba;
+  --paper: #000; --panel: #101010; --soft: #202020; --ink: #e6e6e6; --muted: #a0a0a0; --rule: #2b2b2b; --accent: #94deba; --warn: #f2c94c;
   --radius: 8px; --radius-sm: 6px;
   --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -48,12 +48,18 @@ h2 { font-size: clamp(1.5rem, 3vw, 1.875rem); letter-spacing: -0.02em; margin: 0
 .btn { display: inline-block; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--rule); background: var(--panel); text-decoration: none; font-size: 0.9375rem; font-weight: 600; }
 .btn:hover { border-color: var(--muted); }
 .btn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+.btn.gh { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: #000; border-color: var(--ink); }
+.btn.gh:hover { background: #fff; border-color: #fff; }
+.callout { margin: 28px 0 0; max-width: 68ch; padding: 14px 16px; border: 1px solid rgb(242 201 76 / 0.4); border-radius: var(--radius); background: rgb(242 201 76 / 0.08); color: var(--ink); }
+.callout strong { color: var(--warn); }
+.callout a { color: var(--warn); }
 section { margin-bottom: 72px; }
 .sub { color: var(--muted); margin: 0 0 24px; font-size: 1.0625rem; }
 .note { color: var(--muted); font-size: 0.875rem; margin: 12px 0 0; }
-.note a, .sub a { color: var(--accent); }
-.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-width: 520px; margin: 0 auto 16px; padding: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius); }
+.note a, .sub a, .lede a { color: var(--accent); }
+.modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; max-width: 880px; margin: 0 auto 16px; padding: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--radius); }
 .modes button { display: grid; gap: 2px; padding: 8px 12px; border: 0; border-radius: 4px; background: none; color: var(--ink); font: 600 1rem var(--sans); cursor: pointer; transition: background-color .15s, color .15s; }
+@media (max-width: 760px) { .modes { grid-template-columns: 1fr 1fr; } }
 .modes small { font-size: 0.8125rem; font-weight: 400; color: var(--muted); }
 .modes button:hover { background: var(--soft); }
 .modes button[aria-pressed="true"] { background: var(--accent); color: #000; }
@@ -84,7 +90,8 @@ tbody tr:last-child > * { border-bottom: 0; }
 th { color: var(--muted); font-weight: 600; font-size: 0.875rem; }
 td:first-child { font-family: var(--mono); white-space: nowrap; }
 td a { color: var(--accent); }
-.builds { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.builds { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 640px) { .builds { grid-template-columns: 1fr; } }
 figure { margin: 0; display: grid; gap: 8px; }
 .builds img { border: 1px solid var(--rule); border-radius: var(--radius); }
 figcaption { color: var(--muted); font-size: 0.9375rem; }
@@ -121,16 +128,19 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
 <main>
   <div class="hero">
     <h1>A pocket deck you can print.</h1>
-    <p class="lede">An iPhone 12 mini and a mini Bluetooth keyboard in a 3D-printed shell: a clamshell with a hinged lid, or a one-piece slate.</p>
+    <p class="lede">An iPhone 12 mini and a mini Bluetooth keyboard in a 3D-printed shell: a clamshell with a hinged lid, or a one-piece slate. The phone runs <a href="https://deckterm.cobanov.dev">DeckTerm</a>, an SSH terminal made for landscape and the keyboard.</p>
     <div class="actions">
       <a class="btn primary" href="#files">Download the STL files</a>
       <a class="btn" href="https://github.com/cobanov/cyberdeck#readme">Read the build notes</a>
+      <a class="btn" href="https://deckterm.cobanov.dev">Get DeckTerm</a>
+      <a class="btn gh" href="https://github.com/cobanov/cyberdeck"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>View on GitHub</a>
     </div>
+    <p class="callout" role="note"><strong>Help wanted: the hinge.</strong> The clamshell's hinge is its weakest part: two M3 screws are the pins, nothing holds the lid shut, and a tenth of a millimetre of print error moves the 112° stop by about 2°. The project is open source. If you design hinges or enclosures for a living, your help is very welcome: open an <a href="https://github.com/cobanov/cyberdeck/issues">issue</a> or a pull request on GitHub.</p>
   </div>
 
   <section aria-labelledby="builds">
-    <h2 id="builds">Two builds</h2>
-    <p class="sub">The same phone and keyboard, hinged or flat.</p>
+    <h2 id="builds">Four builds</h2>
+    <p class="sub">The same phone and keyboard, hinged or flat, the phone held by MagSafe or slid into a frame.</p>
     <div class="builds">
       <figure>
         <img src="/img/cyberdeck_render-mint-960.jpg" width="960" height="640" alt="A clamshell deck, open on a wooden table: an iPhone in the lid shows a terminal, a compact keyboard sits in the base.">
@@ -140,6 +150,14 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
         <img src="/img/slate_hero-mint-960.jpg" width="960" height="640" alt="A flat one-piece slate on a wooden table, holding an iPhone above a compact keyboard.">
         <figcaption>Slate: one flat piece, 138 × 141 × 13.4 mm.</figcaption>
       </figure>
+      <figure>
+        <img src="/img/slide-in_clamshell-960.jpg" width="960" height="640" alt="A red clamshell deck, open on a wooden table: an iPhone framed in the lid, a compact keyboard in the black base.">
+        <figcaption>Slide-in clamshell: the phone slides into the lid and a tab clicks in behind it. No ring sticker.</figcaption>
+      </figure>
+      <figure>
+        <img src="/img/slide-in_slate-960.jpg" width="960" height="640" alt="A red one-piece slate on a wooden table, the iPhone held in a frame above a compact keyboard.">
+        <figcaption>Slide-in slate: the phone slides into a frame and stays by its snug fit. No ring sticker.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -147,8 +165,10 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
     <h2 id="models">Models</h2>
     <p class="sub">Drag to turn, scroll or pinch to zoom, right-drag or two fingers to move.</p>
     <div class="modes" role="group" aria-label="Build">
-      <button data-view="clamshell" aria-pressed="true">Clamshell<small>Hinged lid, closes over the keys</small></button>
-      <button data-view="slate" aria-pressed="false">Slate<small>One flat piece</small></button>
+      <button data-view="clamshell" aria-pressed="true">Clamshell<small>Hinged lid, MagSafe</small></button>
+      <button data-view="slate" aria-pressed="false">Slate<small>One flat piece, MagSafe</small></button>
+      <button data-view="clamshell-slide" aria-pressed="false">Slide-in clamshell<small>No ring sticker</small></button>
+      <button data-view="slate-slide" aria-pressed="false">Slide-in slate<small>No ring sticker</small></button>
     </div>
     <div class="viewer" id="viewer">
       <div class="status"><span id="status">Loading…</span><span id="download"></span></div>
@@ -172,7 +192,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
 
   <section aria-labelledby="files">
     <h2 id="files">Files</h2>
-    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; the slate needs none. In both the phone drops into a pocket and MagSafe holds it: stick a steel MagSafe ring sticker into the round recess in the pocket's floor.</p>
+    <p class="sub">Creality K1, PLA, 0.2 mm layers, 3 walls, 20 % gyroid, no brim. The lid needs supports under its two hinge knuckles; the slate needs none. In the MagSafe builds the phone drops into a pocket and its magnets hold it: stick a steel MagSafe ring sticker into the round recess in the pocket's floor. The slide-in builds are the earlier design and need no sticker; they print with supports, and these last revisions haven't been printed yet.</p>
     <div class="table">
       <table>
         <thead><tr><th>File</th><th>What</th><th>Print</th></tr></thead>
@@ -181,6 +201,8 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
           <tr><td><a href="/models/stl/lid.stl" download>lid.stl</a></td><td>Clamshell: MagSafe phone pocket and hinge knuckles</td><td>Back plate down, tree supports under the knuckles</td></tr>
           <tr><td><a href="/models/stl/fit_keyboard.stl" download>fit_keyboard.stl</a></td><td>Fit test: a slice of the keyboard pocket</td><td>Before the full parts, to try the fit</td></tr>
           <tr><td><a href="/models/stl/slate.stl" download>slate.stl</a></td><td>Slate: phone on top, held by MagSafe; keyboard below; one piece</td><td>Back down, no supports</td></tr>
+          <tr><td><a href="/models/stl/slide-in/lid.stl" download="slide-in_lid.stl">slide-in/lid.stl</a></td><td>Slide-in clamshell: phone bay with a latch tab and hinge knuckles; prints with the same base.stl</td><td>Back plate down, tree supports under the knuckles</td></tr>
+          <tr><td><a href="/models/stl/slide-in/slate.stl" download="slide-in_slate.stl">slide-in/slate.stl</a></td><td>Slide-in slate: phone in a frame on top, keyboard below; one piece</td><td>Back down, tree supports from the bed; cut the thin skins out of the screen and camera windows</td></tr>
           <tr><td><a href="/models/stl/radius_gauge.stl" download>radius_gauge.stl</a></td><td>Corner radius gauge, 7–11.5 mm, for a different phone or keyboard</td><td>Flat</td></tr>
           <tr><td><a href="/models/stl/radius_gauge_case.stl" download>radius_gauge_case.stl</a><br><a href="/models/stl/radius_gauge_lid.stl" download>radius_gauge_lid.stl</a></td><td>Case and sliding lid for the gauge tiles</td><td>Upright and flat, no supports</td></tr>
         </tbody>
@@ -205,7 +227,7 @@ footer { border-top: 1px solid var(--rule); background: var(--panel); margin-top
         <ul>
           <li><a href="#models">3D viewer</a></li>
           <li><a href="#files">Files</a></li>
-          <li><a href="#builds">Two builds</a></li>
+          <li><a href="#builds">Four builds</a></li>
         </ul>
       </div>
       <div>
@@ -242,15 +264,24 @@ const box = document.getElementById('viewer'), status = document.getElementById(
 const BLACK = 0x2a2a2f, GREY = 0xb8b8b8, GLASS = 0x0c0e12, CASE = 'case';   // CASE: the part the colour swatches paint
 const COLORS = { red: 0xa3162b, white: 0xdcdcd8, mint: 0x94deba, black: 0x2a2a2f };
 let colour = 'mint';
-const [dims, sdims] = await Promise.all(['render/dims.json', 'render/slate/dims.json'].map(f => fetch(M + f).then(r => r.json())));
+// Both clamshell lids share one hinge (same YA, ZA, OPEN); the slates differ in length, so each flips by its own dims.
+const [dims, sdims, sdimsSlide] = await Promise.all(['render/dims.json', 'render/slate/dims.json', 'render/slide-in/slate/dims.json']
+  .map(f => fetch(M + f).then(r => r.json())));
 // Each view's parts; parts sharing a name share a tick box. hinged: turns with the lid; flip: a face-down slate mesh, shown
-// face up like the print file.
+// face up like the print file. colour: the case colour a view starts in (the slide-in builds are shown in red).
 const VIEWS = {
-  clamshell: { parts: [{ name: 'Base', path: 'render/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY },
+  clamshell: { colour: 'mint', parts: [{ name: 'Base', path: 'render/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY },
                        { name: 'Lid', path: 'render/lid.stl', color: CASE, hinged: true }, { name: 'Phone', path: 'render/phone.stl', color: GLASS, hinged: true }] },
-  slate: { file: 'stl/slate.stl', parts: [{ name: 'Slate', path: 'render/slate/slate.stl', color: CASE, flip: true },
-                                          { name: 'Keyboard', path: 'render/slate/kb_body.stl', color: GREY },
-                                          { name: 'Phone', path: 'render/slate/phone.stl', color: GLASS, flip: true }] },
+  slate: { colour: 'mint', file: 'stl/slate.stl', dims: sdims,
+           parts: [{ name: 'Slate', path: 'render/slate/slate.stl', color: CASE, flip: true },
+                   { name: 'Keyboard', path: 'render/slate/kb_body.stl', color: GREY },
+                   { name: 'Phone', path: 'render/slate/phone.stl', color: GLASS, flip: true }] },
+  'clamshell-slide': { colour: 'red', parts: [{ name: 'Base', path: 'render/base.stl', color: BLACK }, { name: 'Keyboard', path: 'render/kb_body.stl', color: GREY },
+                       { name: 'Lid', path: 'render/slide-in/lid.stl', color: CASE, hinged: true }, { name: 'Phone', path: 'render/slide-in/phone.stl', color: GLASS, hinged: true }] },
+  'slate-slide': { colour: 'red', file: 'stl/slide-in/slate.stl', dims: sdimsSlide,
+                   parts: [{ name: 'Slate', path: 'render/slide-in/slate/slate.stl', color: CASE, flip: true },
+                           { name: 'Keyboard', path: 'render/slate/kb_body.stl', color: GREY },
+                           { name: 'Phone', path: 'render/slide-in/slate/phone.stl', color: GLASS, flip: true }] },
 };
 const hidden = new Set(['Keyboard', 'Phone']);   // the shell alone at first, so its pockets show; ticks carry across views
 
@@ -281,14 +312,14 @@ function setAngle(a) {
 async function show(name) {
   shown = name;
   status.textContent = 'Loading…'; dl.textContent = '';
-  const { parts, file } = VIEWS[name];
+  const { parts, file, dims: fd } = VIEWS[name];
   let meshes;
   try {
     meshes = await Promise.all(parts.map(async ({ name: part, path, color, hinged, flip }) => {
       const g = (await geometry(path)).clone();
       // The render meshes are modelled closed; the lid and phone turn about the hinge axis (x, through YA, ZA).
       if (hinged) g.translate(0, -dims.YA, -dims.ZA);
-      if (flip) { g.rotateX(Math.PI); g.translate(0, sdims.L, sdims.T); }
+      if (flip) { g.rotateX(Math.PI); g.translate(0, fd.L, fd.T); }
       g.computeVertexNormals();
       const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: color === CASE ? COLORS[colour] : color, roughness: 0.55 }));
       Object.assign(m.userData, { case: color === CASE, hinged, part });
@@ -323,7 +354,7 @@ async function show(name) {
   camera.position.copy(c).add(new THREE.Vector3(0.75, -1.3, 0.9).normalize().multiplyScalar(size * 1.6 / Math.min(1, camera.aspect)));
   camera.near = size / 100; camera.far = size * 20; camera.updateProjectionMatrix();
   status.textContent = `${size.toFixed(0)} mm across`;
-  if (file) dl.innerHTML = `<a href="${M + file}" download>Download ${file.split('/').pop()}</a>`;
+  if (file) dl.innerHTML = `<a href="${M + file}" download="${file.slice(4).replace('/', '_')}">Download ${file.slice(4)}</a>`;
 }
 
 function resize() {
@@ -345,14 +376,20 @@ renderer.setAnimationLoop(t => {
 swing.addEventListener('click', () => { target = angle > dims.OPEN / 2 ? 0 : dims.OPEN; });
 slider.addEventListener('input', () => { target = null; setAngle(+slider.value); });
 
+function pick(c) {
+  colour = c;
+  document.querySelectorAll('.colors button').forEach(x => x.setAttribute('aria-pressed', x.dataset.color === c));
+  group?.traverse(m => m.userData.case && m.material.color.setHex(COLORS[c]));
+}
 document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.modes button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  const v = VIEWS[b.dataset.view];
+  if (v.colour !== VIEWS[shown].colour) pick(v.colour);   // MagSafe <-> slide-in: back to that family's colour
   show(b.dataset.view);
 }));
 document.querySelectorAll('.colors button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.colors button').forEach(x => x.setAttribute('aria-pressed', x === b));
-  colour = b.dataset.color;
-  group?.traverse(m => m.userData.case && m.material.color.setHex(COLORS[colour]));
+  pick(b.dataset.color);
+  // the slide-in photos have no colour in their names, so they stay red
   document.querySelectorAll('.builds img').forEach(i => { i.src = i.src.replace(/-(red|white|mint|black)-960/, `-${colour}-960`); });
 }));
 show('clamshell');
