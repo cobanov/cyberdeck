@@ -90,3 +90,10 @@ lid haven't been printed yet. Nothing holds the clamshell's lid closed, and the 
 out of the slate to charge.
 
 The phone runs [DeckTerm](https://github.com/cobanov/deckterm), a landscape SSH terminal made for this deck.
+
+## License
+
+The scripts, slicer profiles and site code are under the [MIT License](LICENSE). The STL and FreeCAD models and the
+images are under [CC BY 4.0](LICENSE-MODELS): you can print, change, share and sell them if you credit Mert Cobanov
+and link to this repository. This covers the design files, not the iPhone or the Torima keyboard they fit. The site's
+JetBrains Mono font keeps its own [OFL license](site/public/fonts/JetBrainsMono-OFL.txt).
